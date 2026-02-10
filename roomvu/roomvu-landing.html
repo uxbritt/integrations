@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Constant Contact + roomvu — AI-Powered Video Marketing</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            main: {
+              50: '#f6fcff', 100: '#e6f8ff', 200: '#d6eafe', 300: '#a6d3fd',
+              400: '#65abff', 500: '#468af1', 600: '#186ded',
+              700: '#085fe2', 800: '#1357be', 900: '#0046ae', 950: '#0b3c85'
+            },
+            neutral: {
+              50: '#fcfcfd', 100: '#f7f9fd', 200: '#f0f4fa', 300: '#dce2ec',
+              400: '#c9d0de', 500: '#8d9bb6', 600: '#6b7492',
+              700: '#63708a', 800: '#5d687e', 900: '#3f4b63', 950: '#313b4d'
+            },
+            success: {
+              50: '#f6fef9', 100: '#ecfdf3', 200: '#dbfae6', 300: '#a9efc5',
+              400: '#75e0a7', 500: '#47cd89', 600: '#17b26a',
+              700: '#079455', 800: '#067647', 900: '#085d3a'
+            },
+            accent: {
+              50: '#fbfaff', 100: '#f5f3ff', 200: '#ece9fe', 300: '#ddd6fe',
+              400: '#c3b5fd', 500: '#a48afb', 600: '#875bf7',
+              700: '#7839ee', 800: '#6927da', 900: '#5720b7'
+            },
+            roomvu: {
+              primary: '#FF6B35',
+              secondary: '#1E3A5F',
+              light: '#FFF4F0'
+            }
+          },
+          fontFamily: {
+            sans: ['CTSans', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @font-face {
+      font-family: 'CTSans';
+      src: url('fonts/CTSans-Regular.woff2') format('woff2');
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: 'CTSans';
+      src: url('fonts/CTSans-Semibold.woff2') format('woff2');
+      font-weight: 600;
+    }
+    @font-face {
+      font-family: 'CTSans';
+      src: url('fonts/CTSans-Bold.woff2') format('woff2');
+      font-weight: 700;
+    }
+
+    .hero-gradient {
+      background: linear-gradient(135deg, #0b3c85 0%, #186ded 40%, #FF6B35 100%);
+    }
+    .text-gradient {
+      background: linear-gradient(135deg, #186ded 0%, #FF6B35 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+    .float-animation {
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    .float-delay-1 { animation-delay: 1s; }
+    .float-delay-2 { animation-delay: 2s; }
+    
+    .video-preview {
+      position: relative;
+      background: linear-gradient(135deg, #1E3A5F 0%, #FF6B35 100%);
+    }
+    .video-preview::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .testimonial-card {
+      transition: all 0.3s ease;
+    }
+    .testimonial-card:hover {
+      transform: scale(1.02);
+    }
+
+    .pulse-cta {
+      animation: pulse-cta 2s infinite;
+    }
+    @keyframes pulse-cta {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.4); }
+      50% { box-shadow: 0 0 0 20px rgba(255, 107, 53, 0); }
+    }
+
+    .stat-counter {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .feature-icon {
+      transition: all 0.3s ease;
+    }
+    .feature-card:hover .feature-icon {
+      transform: scale(1.1);
+    }
+
+    .scroll-fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s ease-out;
+    }
+    .scroll-fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body class="font-sans bg-white">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-neutral-100 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <!-- Co-branded logos -->
+      <div class="flex items-center gap-4">
+        <img src="assets/ctctLogo.png" alt="Constant Contact" class="h-8 object-contain">
+        <div class="flex items-center gap-2 px-3 py-1 bg-neutral-100 rounded-full">
+          <span class="text-xs font-medium text-neutral-500">+</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF6B35] to-[#FF8F66] flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+          </div>
+          <span class="font-semibold text-[#1E3A5F]">roomvu</span>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#features" class="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">Features</a>
+        <a href="#how-it-works" class="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">How It Works</a>
+        <a href="#pricing" class="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">Pricing</a>
+        <a href="#testimonials" class="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">Testimonials</a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <a href="#" class="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">Sign in</a>
+        <a href="roomvu-onboarding.html" class="px-5 py-2.5 bg-gradient-to-r from-main-600 to-[#FF6B35] hover:from-main-500 hover:to-[#FF7F4D] text-white rounded-lg font-semibold text-sm transition-all shadow-lg shadow-main-600/25">
+          Get Started Free
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero-gradient pt-32 pb-20 px-6 relative overflow-hidden">
+    <!-- Background elements -->
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="absolute top-20 left-10 w-72 h-72 bg-white/5 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-20 right-10 w-96 h-96 bg-[#FF6B35]/20 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <!-- Left: Content -->
+        <div>
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-white/20">
+            <span class="w-2 h-2 bg-success-400 rounded-full animate-pulse"></span>
+            <span class="text-sm text-white/90">New Partnership</span>
+          </div>
+          
+          <h1 class="text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+            AI-Powered<br>
+            <span class="text-[#FFD4C4]">Video Marketing</span><br>
+            Made Simple
+          </h1>
+          
+          <p class="text-xl text-white/80 mb-8 max-w-lg">
+            Combine the power of Constant Contact's email marketing with roomvu's automated video content. Create complete campaigns in minutes, not hours.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-4 mb-10">
+            <a href="roomvu-onboarding.html" class="pulse-cta px-8 py-4 bg-white hover:bg-neutral-50 text-main-700 rounded-xl font-bold text-lg transition-all shadow-xl flex items-center gap-3">
+              <span>Start Free Trial</span>
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+            <a href="#demo" class="px-8 py-4 bg-white/10 hover:bg-white/20 text-white border border-white/30 rounded-xl font-semibold text-lg transition-all flex items-center gap-3">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              <span>Watch Demo</span>
+            </a>
+          </div>
+
+          <!-- Trust badges -->
+          <div class="flex items-center gap-6">
+            <div class="flex -space-x-3">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&fit=crop&crop=face" class="w-10 h-10 rounded-full border-2 border-white" alt="">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" class="w-10 h-10 rounded-full border-2 border-white" alt="">
+              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=40&h=40&fit=crop&crop=face" class="w-10 h-10 rounded-full border-2 border-white" alt="">
+              <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=40&h=40&fit=crop&crop=face" class="w-10 h-10 rounded-full border-2 border-white" alt="">
+              <div class="w-10 h-10 rounded-full border-2 border-white bg-white/20 flex items-center justify-center text-white text-xs font-bold">+5k</div>
+            </div>
+            <div class="text-white/80 text-sm">
+              <span class="font-semibold text-white">5,000+</span> businesses already using this bundle
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Video Preview -->
+        <div class="relative">
+          <div class="float-animation">
+            <div class="video-preview rounded-2xl overflow-hidden shadow-2xl border border-white/20">
+              <div class="aspect-video flex items-center justify-center relative p-8">
+                <!-- Mock video player -->
+                <div class="absolute inset-4 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 flex flex-col">
+                  <!-- Video header -->
+                  <div class="p-4 border-b border-white/10 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
+                        <span class="text-[#FF6B35] font-bold text-sm">AR</span>
+                      </div>
+                      <div>
+                        <p class="text-white font-semibold text-sm">Acme Real Estate</p>
+                        <p class="text-white/60 text-xs">Market Update Video</p>
+                      </div>
+                    </div>
+                    <span class="px-2 py-1 bg-success-500 text-white text-xs font-medium rounded">LIVE</span>
+                  </div>
+                  <!-- Video content -->
+                  <div class="flex-1 flex items-center justify-center">
+                    <div class="text-center">
+                      <div class="w-16 h-16 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-3">
+                        <svg class="w-8 h-8 text-white ml-1" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                      </div>
+                      <p class="text-white/80 text-sm">Auto-generated video</p>
+                    </div>
+                  </div>
+                  <!-- Video footer -->
+                  <div class="p-4 border-t border-white/10">
+                    <div class="flex items-center gap-2 mb-2">
+                      <div class="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
+                        <div class="w-1/3 h-full bg-[#FF6B35] rounded-full"></div>
+                      </div>
+                      <span class="text-white/60 text-xs">0:15 / 0:45</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-3 text-white/60">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" x2="5" y1="19" y2="5"></line></svg>
+                        <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" x2="19" y1="5" y2="19"></line></svg>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-white/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                        <svg class="w-4 h-4 text-white/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating badges -->
+          <div class="absolute -left-4 top-1/4 float-animation float-delay-1">
+            <div class="bg-white rounded-xl shadow-xl p-3 flex items-center gap-3">
+              <div class="w-10 h-10 bg-main-100 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-main-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              </div>
+              <div>
+                <p class="text-xs text-neutral-500">Email sent!</p>
+                <p class="text-sm font-semibold text-neutral-900">2.5k opens</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="absolute -right-4 bottom-1/4 float-animation float-delay-2">
+            <div class="bg-white rounded-xl shadow-xl p-3 flex items-center gap-3">
+              <div class="w-10 h-10 bg-[#FF6B35]/10 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-[#FF6B35]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+              </div>
+              <div>
+                <p class="text-xs text-neutral-500">Video views</p>
+                <p class="text-sm font-semibold text-neutral-900">12.4k plays</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Logos Section -->
+  <section class="py-12 px-6 border-b border-neutral-100">
+    <div class="max-w-7xl mx-auto">
+      <p class="text-center text-sm text-neutral-500 mb-8">Trusted by leading brands and agencies</p>
+      <div class="flex items-center justify-center gap-12 flex-wrap opacity-50 grayscale">
+        <div class="text-2xl font-bold text-neutral-400">RE/MAX</div>
+        <div class="text-2xl font-bold text-neutral-400">Keller Williams</div>
+        <div class="text-2xl font-bold text-neutral-400">Century 21</div>
+        <div class="text-2xl font-bold text-neutral-400">Coldwell Banker</div>
+        <div class="text-2xl font-bold text-neutral-400">eXp Realty</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="py-16 px-6 bg-neutral-50">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div class="text-center">
+          <div class="text-5xl font-bold text-main-600 stat-counter mb-2">60%</div>
+          <p class="text-neutral-600">Less time creating content</p>
+        </div>
+        <div class="text-center">
+          <div class="text-5xl font-bold text-[#FF6B35] stat-counter mb-2">3x</div>
+          <p class="text-neutral-600">More engagement</p>
+        </div>
+        <div class="text-center">
+          <div class="text-5xl font-bold text-accent-600 stat-counter mb-2">500+</div>
+          <p class="text-neutral-600">Video templates</p>
+        </div>
+        <div class="text-center">
+          <div class="text-5xl font-bold text-success-600 stat-counter mb-2">95%</div>
+          <p class="text-neutral-600">Brand consistency</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="py-20 px-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="inline-block px-4 py-2 bg-main-100 text-main-700 rounded-full text-sm font-medium mb-4">The Complete Bundle</span>
+        <h2 class="text-4xl font-bold text-neutral-900 mb-4">Everything you need to market like a pro</h2>
+        <p class="text-xl text-neutral-500 max-w-2xl mx-auto">Constant Contact's powerful email tools + roomvu's automated video = unstoppable marketing</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <div class="feature-card card-hover bg-white rounded-2xl border border-neutral-200 p-8">
+          <div class="feature-icon w-14 h-14 bg-main-100 rounded-xl flex items-center justify-center mb-6">
+            <svg class="w-7 h-7 text-main-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </div>
+          <h3 class="text-xl font-bold text-neutral-900 mb-3">AI Email Generation</h3>
+          <p class="text-neutral-500 mb-4">Generate complete email campaigns with AI. Just describe what you want—we'll write the copy and design the layout.</p>
+          <ul class="space-y-2">
+            <li class="flex items-center gap-2 text-sm text-neutral-600">
+              <svg class="w-4 h-4 text-success-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+              Smart subject lines
+            </li>
+            <li class="flex items-center gap-2 text-sm text-neutral-600">
+              <svg class="w-4 h-4 text-success-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+              A/B testing built-in
+            </li>
+            <li class="flex items-center gap-2 text-sm text-neutral-600">
+              <svg class="w-4 h-4 text-success-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+              Brand kit auto-applied
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-card card-hover bg-white rounded-2xl border border-neutral-200 p-8 relative">
+          <div class="absolute top-4 right-4">
+            <span class="px-3 py-1 bg-[#FF6B35]/10 text-[#FF6B35] text-xs font-bold rounded-full">ROOMVU</span>
+          </div>
+          <div class="feature-icon w-14 h-14 bg-[#FF6B35]/10 rounded-xl flex items-center justify-center mb-6">
+            <svg class="w-7 h-7 text-[#FF6B35]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+          </div>
+          <h3 class="text-xl font-bold text-neutral-900 mb-3">Auto Video Marketing</h3>
+          <p class="text-neutral-500 mb-4">Get professional videos delivered to your inbox—automatically. Market updates, tips, and branded promos.</p>
+          <ul class="space-y-2">
+            <li class="flex items-center gap-2 text-sm text-neutral-600">
+              <svg class="w-4 h-4 text-success-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+              Weekly video content
+            </li>
+            <li class="flex items-center gap-2 text-sm text-neutral-600">
+              <svg class="w-4 h-4 text-success-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+              Your logo on every video
+            </li>
+            <li class="flex items-center gap-2 text-sm text-neutral-600">
+              <svg class="w-4 h-4 text-success-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+              Auto-post to social
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-card card-hover bg-white rounded-2xl border border-neutral-200 p-8">
+          <div class="feature-icon w-14 h-14 bg-accent-100 rounded-xl flex items-center justify-center mb-6">
+            <svg class="w-7 h-7 text-accent-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+          </div>
+          <h3 class="text-xl font-bold text-neutral-900 mb-3">Campaign Autopilot</h3>
+          <p class="text-neutral-500 mb-4">Never miss a marketing moment. Get suggested campaigns for holidays, events, and seasonal promotions.</p>
+          <ul class="space-y-2">
+            <li class="flex items-center gap-2 text-sm text-neutral-600">
+              <svg class="w-4 h-4 text-success-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+              Pre-built calendar
+            </li>
+            <li class="flex items-center gap-2 text-sm text-neutral-600">
+              <svg class="w-4 h-4 text-success-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+              Industry-specific
+            </li>
+            <li class="flex items-center gap-2 text-sm text-neutral-600">
+              <svg class="w-4 h-4 text-success-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+              One-click generate
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how-it-works" class="py-20 px-6 bg-gradient-to-b from-neutral-50 to-white">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="inline-block px-4 py-2 bg-accent-100 text-accent-700 rounded-full text-sm font-medium mb-4">Simple Setup</span>
+        <h2 class="text-4xl font-bold text-neutral-900 mb-4">Up and running in minutes</h2>
+        <p class="text-xl text-neutral-500 max-w-2xl mx-auto">Three simple steps to transform your marketing</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Step 1 -->
+        <div class="text-center">
+          <div class="w-16 h-16 mx-auto bg-gradient-to-br from-main-500 to-main-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-main-600/25">
+            <span class="text-2xl font-bold text-white">1</span>
+          </div>
+          <h3 class="text-xl font-bold text-neutral-900 mb-3">Connect Your Brand</h3>
+          <p class="text-neutral-500">Enter your website URL and we'll automatically import your logo, colors, and fonts.</p>
+        </div>
+
+        <!-- Arrow -->
+        <div class="hidden md:flex items-center justify-center">
+          <svg class="w-8 h-8 text-neutral-300 -mt-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="text-center">
+          <div class="w-16 h-16 mx-auto bg-gradient-to-br from-[#FF6B35] to-[#FF8F66] rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-[#FF6B35]/25">
+            <span class="text-2xl font-bold text-white">2</span>
+          </div>
+          <h3 class="text-xl font-bold text-neutral-900 mb-3">Link roomvu</h3>
+          <p class="text-neutral-500">Connect your roomvu account or create one—it takes 30 seconds.</p>
+        </div>
+
+        <!-- Arrow -->
+        <div class="hidden md:flex items-center justify-center">
+          <svg class="w-8 h-8 text-neutral-300 -mt-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="text-center">
+          <div class="w-16 h-16 mx-auto bg-gradient-to-br from-success-500 to-success-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-success-600/25">
+            <span class="text-2xl font-bold text-white">3</span>
+          </div>
+          <h3 class="text-xl font-bold text-neutral-900 mb-3">Start Creating</h3>
+          <p class="text-neutral-500">Generate your first campaign with AI—email, social, and video all in one.</p>
+        </div>
+      </div>
+
+      <div class="text-center mt-12">
+        <a href="roomvu-onboarding.html" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-main-600 to-[#FF6B35] hover:from-main-500 hover:to-[#FF7F4D] text-white rounded-xl font-bold text-lg transition-all shadow-lg">
+          Get Started — It's Free
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+        <p class="text-sm text-neutral-400 mt-3">No credit card required • 14-day free trial</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section id="testimonials" class="py-20 px-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="inline-block px-4 py-2 bg-success-100 text-success-700 rounded-full text-sm font-medium mb-4">Customer Love</span>
+        <h2 class="text-4xl font-bold text-neutral-900 mb-4">Real results from real businesses</h2>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Testimonial 1 -->
+        <div class="testimonial-card bg-white rounded-2xl border border-neutral-200 p-8">
+          <div class="flex items-center gap-1 mb-4">
+            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="text-neutral-600 mb-6">"The video content alone is worth it. I went from posting nothing to having professional videos every week. My engagement is through the roof!"</p>
+          <div class="flex items-center gap-3">
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=50&h=50&fit=crop&crop=face" class="w-12 h-12 rounded-full" alt="">
+            <div>
+              <p class="font-semibold text-neutral-900">Sarah Johnson</p>
+              <p class="text-sm text-neutral-500">RE/MAX Agent, Austin TX</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonial 2 -->
+        <div class="testimonial-card bg-white rounded-2xl border border-neutral-200 p-8">
+          <div class="flex items-center gap-1 mb-4">
+            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="text-neutral-600 mb-6">"I used to spend 10+ hours a week on marketing. Now it's about an hour. The AI generates everything and it actually looks better than what I was making."</p>
+          <div class="flex items-center gap-3">
+            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=50&h=50&fit=crop&crop=face" class="w-12 h-12 rounded-full" alt="">
+            <div>
+              <p class="font-semibold text-neutral-900">Michael Chen</p>
+              <p class="text-sm text-neutral-500">Coldwell Banker, Seattle WA</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonial 3 -->
+        <div class="testimonial-card bg-white rounded-2xl border border-neutral-200 p-8">
+          <div class="flex items-center gap-1 mb-4">
+            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="text-neutral-600 mb-6">"Our brokerage rolled this out to 50 agents. The brand consistency alone is amazing—every email and video looks professional and on-brand."</p>
+          <div class="flex items-center gap-3">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=50&h=50&fit=crop&crop=face" class="w-12 h-12 rounded-full" alt="">
+            <div>
+              <p class="font-semibold text-neutral-900">Emily Rodriguez</p>
+              <p class="text-sm text-neutral-500">Broker, Keller Williams Miami</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="py-20 px-6 bg-neutral-900">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="inline-block px-4 py-2 bg-white/10 text-white rounded-full text-sm font-medium mb-4">Simple Pricing</span>
+        <h2 class="text-4xl font-bold text-white mb-4">One bundle, everything included</h2>
+        <p class="text-xl text-neutral-400">No hidden fees. No surprises. Cancel anytime.</p>
+      </div>
+
+      <div class="bg-gradient-to-br from-neutral-800 to-neutral-850 rounded-3xl border border-neutral-700 p-8 md:p-12 relative overflow-hidden">
+        <!-- Background glow -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-[#FF6B35]/20 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-64 h-64 bg-main-600/20 rounded-full blur-3xl"></div>
+
+        <div class="relative z-10 grid md:grid-cols-2 gap-12 items-center">
+          <!-- Left: Price -->
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <span class="px-3 py-1 bg-success-500/20 text-success-400 text-sm font-bold rounded-full">SAVE 30%</span>
+              <span class="text-neutral-400 line-through">$99/mo</span>
+            </div>
+            <div class="flex items-baseline gap-2 mb-4">
+              <span class="text-6xl font-bold text-white">$69</span>
+              <span class="text-xl text-neutral-400">/month</span>
+            </div>
+            <p class="text-neutral-400 mb-6">Billed annually, or $79/month billed monthly</p>
+            
+            <a href="roomvu-onboarding.html" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-main-600 to-[#FF6B35] hover:from-main-500 hover:to-[#FF7F4D] text-white rounded-xl font-bold text-lg transition-all shadow-lg w-full justify-center">
+              Start 14-Day Free Trial
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+            <p class="text-sm text-neutral-500 mt-3 text-center">No credit card required to start</p>
+          </div>
+
+          <!-- Right: Features -->
+          <div>
+            <h3 class="text-lg font-semibold text-white mb-6">Everything included:</h3>
+            <ul class="space-y-4">
+              <li class="flex items-start gap-3">
+                <div class="w-6 h-6 bg-main-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-4 h-4 text-main-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div>
+                  <p class="text-white font-medium">Constant Contact Email</p>
+                  <p class="text-neutral-400 text-sm">Unlimited emails, automation, analytics</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <div class="w-6 h-6 bg-[#FF6B35]/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-4 h-4 text-[#FF6B35]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div>
+                  <p class="text-white font-medium">roomvu Video Marketing</p>
+                  <p class="text-neutral-400 text-sm">Unlimited videos, social posting, brand watermarks</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <div class="w-6 h-6 bg-accent-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-4 h-4 text-accent-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div>
+                  <p class="text-white font-medium">AI Content Studio</p>
+                  <p class="text-neutral-400 text-sm">Generate email, social, and video in one click</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <div class="w-6 h-6 bg-success-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-4 h-4 text-success-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div>
+                  <p class="text-white font-medium">Campaign Autopilot</p>
+                  <p class="text-neutral-400 text-sm">Pre-built campaigns for your industry</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="py-20 px-6 bg-gradient-to-r from-main-600 to-[#FF6B35]">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-4xl font-bold text-white mb-6">Ready to transform your marketing?</h2>
+      <p class="text-xl text-white/80 mb-10 max-w-2xl mx-auto">Join 5,000+ businesses using the Constant Contact + roomvu bundle to create stunning content in minutes.</p>
+      
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a href="roomvu-onboarding.html" class="px-10 py-5 bg-white hover:bg-neutral-50 text-main-700 rounded-xl font-bold text-lg transition-all shadow-xl flex items-center gap-3">
+          <span>Start Your Free Trial</span>
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+        <a href="#demo" class="px-10 py-5 bg-white/10 hover:bg-white/20 text-white border border-white/30 rounded-xl font-semibold text-lg transition-all flex items-center gap-3">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>Talk to Sales</span>
+        </a>
+      </div>
+
+      <p class="text-white/60 text-sm mt-6">14-day free trial • No credit card required • Cancel anytime</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-12 px-6 bg-neutral-950">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-wrap items-center justify-between gap-6 mb-8 pb-8 border-b border-neutral-800">
+        <!-- Logos -->
+        <div class="flex items-center gap-4">
+          <img src="assets/ctctLogo.png" alt="Constant Contact" class="h-6 object-contain brightness-0 invert opacity-70">
+          <span class="text-neutral-600">+</span>
+          <div class="flex items-center gap-2 opacity-70">
+            <div class="w-6 h-6 rounded bg-[#FF6B35] flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+            </div>
+            <span class="text-white text-sm">roomvu</span>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div class="flex flex-wrap items-center gap-6 text-sm text-neutral-500">
+          <a href="#" class="hover:text-white transition-colors">Privacy</a>
+          <a href="#" class="hover:text-white transition-colors">Terms</a>
+          <a href="#" class="hover:text-white transition-colors">Support</a>
+          <a href="#" class="hover:text-white transition-colors">Contact</a>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-4 text-sm text-neutral-600">
+        <p>© 2026 Constant Contact, Inc. All rights reserved.</p>
+        <p>Partnership powered by roomvu Video Marketing</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
+

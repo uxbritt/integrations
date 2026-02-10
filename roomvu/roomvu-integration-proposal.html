@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Content Studio — Integration Proposal</title>
+  <link rel="stylesheet" href="mobile-responsive.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            // Rise-UI Design Tokens
+            main: {
+              50: '#f6fcff', 100: '#e6f8ff', 200: '#d6eafe', 300: '#a6d3fd',
+              400: '#65abff', 500: '#468af1', 600: '#186ded',
+              700: '#085fe2', 800: '#1357be', 900: '#0046ae', 950: '#0b3c85'
+            },
+            accent: {
+              50: '#fbfaff', 100: '#f5f3ff', 200: '#ece9fe', 300: '#ddd6fe',
+              400: '#c3b5fd', 500: '#a48afb', 600: '#875bf7',
+              700: '#7839ee', 800: '#6927da', 900: '#5720b7'
+            },
+            success: {
+              50: '#f6fef9', 100: '#ecfdf3', 200: '#dbfae6', 300: '#a9efc5',
+              400: '#75e0a7', 500: '#47cd89', 600: '#17b26a',
+              700: '#079455', 800: '#067647', 900: '#085d3a'
+            },
+            warning: {
+              50: '#fffcf5', 100: '#fff8eb', 200: '#fff2de', 300: '#ffdaaf',
+              400: '#ffca8d', 500: '#ffb26b', 600: '#f79009',
+              700: '#e97420', 800: '#d55b03', 900: '#93370d'
+            },
+            danger: {
+              50: '#fffafa', 100: '#fef3f2', 200: '#fee4e2', 300: '#fecdca',
+              400: '#fda29b', 500: '#fe5a58', 600: '#f04438',
+              700: '#d92d20', 800: '#b42318', 900: '#912018'
+            }
+          },
+          fontFamily: {
+            sans: ['CTSans', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @font-face {
+      font-family: 'CTSans';
+      src: url('fonts/CTSans-Regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'CTSans';
+      src: url('fonts/CTSans-Semibold.woff2') format('woff2');
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'CTSans';
+      src: url('fonts/CTSans-Bold.woff2') format('woff2');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    .slide {
+      display: none;
+      animation: fadeIn 0.4s ease-out;
+    }
+    .slide.active {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #186ded 0%, #875bf7 50%, #f79009 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .gradient-text-ai {
+      background: linear-gradient(135deg, #875bf7 0%, #f79009 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    body {
+      background: linear-gradient(135deg, #0f0f1a 0%, #131825 25%, #0a0e17 50%, #0d1220 75%, #0f0f1a 100%);
+      background-attachment: fixed;
+      transition: background 0.3s ease;
+      color: #fafafa;
+    }
+    .slide-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(100, 116, 139, 0.3);
+      backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+    }
+    .slide-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(100, 116, 139, 0.5);
+    }
+    .feature-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(100, 116, 139, 0.3);
+      backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(135, 91, 247, 0.5);
+    }
+    .competitor-logo {
+      filter: grayscale(100%) brightness(1.5);
+      opacity: 0.7;
+      transition: all 0.3s ease;
+    }
+    .competitor-logo:hover {
+      filter: none;
+      opacity: 1;
+    }
+    .phase-card {
+      position: relative;
+      overflow: hidden;
+    }
+    .phase-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--phase-color) 0%, transparent 100%);
+    }
+    .metric-card {
+      background: linear-gradient(135deg, rgba(135, 91, 247, 0.1) 0%, rgba(24, 109, 237, 0.1) 100%);
+      border: 1px solid rgba(135, 91, 247, 0.3);
+    }
+    .timeline-dot {
+      position: relative;
+    }
+    .timeline-dot::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 40px;
+      background: linear-gradient(180deg, rgba(135, 91, 247, 0.5) 0%, transparent 100%);
+    }
+    .timeline-dot:last-child::after {
+      display: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen font-sans">
+
+  <!-- Slide Container -->
+  <div class="min-h-screen flex items-center justify-center pb-16 px-8">
+    
+    <!-- Slide 1: Title -->
+    <div id="slide-1" class="slide cover-slide active flex-col items-center justify-center text-center max-w-5xl w-full">
+      <div class="mb-8">
+        <div class="flex items-center justify-center gap-3 mb-6">
+          <span class="inline-block px-4 py-1.5 bg-accent-900/50 text-accent-300 rounded-full text-sm font-medium border border-accent-700/50">Proposal</span>
+          <span class="inline-block px-3 py-1.5 bg-zinc-800 text-zinc-500 rounded-full text-xs font-medium">Integration Partner Evaluation</span>
+        </div>
+        <h1 class="text-5xl font-bold text-white mb-6 leading-tight">AI Content Studio<br><span class="gradient-text">Integration Proposal</span></h1>
+        <p class="text-xl text-zinc-400 max-w-2xl mx-auto">Expanding Constant Contact's AI capabilities with <strong class="text-white">multi-format content generation</strong> inspired by roomvu's automated marketing approach</p>
+      </div>
+      <div class="flex items-center gap-6 mt-12">
+        <div class="flex items-center gap-2 text-zinc-500">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.2 2.2m8.4 8.4 2.2 2.2M5.6 18.4l2.2-2.2m8.4-8.4 2.2-2.2"/><circle cx="12" cy="12" r="4"/></svg>
+          <span class="text-sm">AI-Powered</span>
+        </div>
+        <div class="w-px h-4 bg-zinc-700"></div>
+        <div class="flex items-center gap-2 text-zinc-500">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+          <span class="text-sm">Video + Email + Social</span>
+        </div>
+        <div class="w-px h-4 bg-zinc-700"></div>
+        <div class="flex items-center gap-2 text-zinc-500">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+          <span class="text-sm">Campaign Autopilot</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 text-zinc-500 mt-10">
+        <span class="text-sm">Use arrows or dots to navigate</span>
+      </div>
+    </div>
+
+    <!-- Slide 2: The Opportunity -->
+    <div id="slide-2" class="slide flex-col items-center justify-center max-w-6xl w-full">
+      <div class="w-full text-center">
+        <div class="flex items-center justify-center gap-3 mb-4">
+          <span class="inline-block px-3 py-1 bg-zinc-800 text-zinc-400 rounded-full text-xs font-medium">Market Gap</span>
+        </div>
+        <h2 class="text-4xl font-bold text-white mb-3">The Opportunity</h2>
+        <p class="text-lg text-zinc-400 mb-10 max-w-2xl mx-auto">Multi-location businesses need done-for-you content automation—not just tools</p>
+        
+        <div class="grid grid-cols-3 gap-5 mb-8">
+          <!-- Pain Point 1 -->
+          <div class="slide-card rounded-xl p-6 text-left">
+            <div class="w-12 h-12 bg-danger-500/20 rounded-xl flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-danger-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Content Creation Burden</h3>
+            <p class="text-zinc-400 text-sm mb-4">Local marketers spend 15+ hours/week creating content manually across channels</p>
+            <div class="flex items-center gap-2 text-danger-400 text-xs font-medium">
+              <span class="w-2 h-2 bg-danger-400 rounded-full"></span>
+              Major friction point
+            </div>
+          </div>
+
+          <!-- Pain Point 2 -->
+          <div class="slide-card rounded-xl p-6 text-left">
+            <div class="w-12 h-12 bg-warning-500/20 rounded-xl flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-warning-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Brand Inconsistency</h3>
+            <p class="text-zinc-400 text-sm mb-4">70% of franchisees create off-brand content when left without centralized assets</p>
+            <div class="flex items-center gap-2 text-warning-400 text-xs font-medium">
+              <span class="w-2 h-2 bg-warning-400 rounded-full"></span>
+              Compliance risk
+            </div>
+          </div>
+
+          <!-- Pain Point 3 -->
+          <div class="slide-card rounded-xl p-6 text-left">
+            <div class="w-12 h-12 bg-accent-500/20 rounded-xl flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-accent-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Video Gap</h3>
+            <p class="text-zinc-400 text-sm mb-4">Video drives 2x engagement but only 23% of SMBs produce it regularly</p>
+            <div class="flex items-center gap-2 text-accent-400 text-xs font-medium">
+              <span class="w-2 h-2 bg-accent-400 rounded-full"></span>
+              Competitive disadvantage
+            </div>
+          </div>
+        </div>
+
+        <!-- Callout -->
+        <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-5 flex items-center justify-center gap-4">
+          <div class="w-10 h-10 bg-main-500/20 rounded-full flex items-center justify-center">
+            <svg class="w-5 h-5 text-main-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+          </div>
+          <p class="text-zinc-300 text-sm"><strong class="text-white">roomvu's model:</strong> Automated, branded content delivered to agents without requiring creative skills</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: roomvu Analysis -->
+    <div id="slide-3" class="slide flex-col items-center justify-center max-w-6xl w-full">
+      <div class="w-full">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-zinc-500 text-sm">Partner Evaluation</span>
+        </div>
+        <h2 class="text-4xl font-bold text-white mb-2">What roomvu Does Well</h2>
+        <p class="text-lg text-zinc-400 mb-8">Key features driving their success in real estate marketing automation</p>
+        
+        <div class="grid grid-cols-2 gap-6">
+          <!-- Left: Features -->
+          <div class="space-y-4">
+            <div class="slide-card rounded-xl p-5">
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 bg-accent-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-accent-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+                </div>
+                <div>
+                  <h3 class="text-base font-semibold text-white mb-1">Automated Video Generation</h3>
+                  <p class="text-zinc-500 text-sm">Market updates, listing videos, and educational content created automatically with agent branding</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="slide-card rounded-xl p-5">
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 bg-main-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-main-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div>
+                  <h3 class="text-base font-semibold text-white mb-1">Brand Watermarking</h3>
+                  <p class="text-zinc-500 text-sm">Agent/brokerage branding automatically overlaid on all video content</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="slide-card rounded-xl p-5">
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 bg-success-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-success-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                </div>
+                <div>
+                  <h3 class="text-base font-semibold text-white mb-1">Auto-Scheduling</h3>
+                  <p class="text-zinc-500 text-sm">Content calendar with pre-built campaigns for seasonal events and market moments</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="slide-card rounded-xl p-5">
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 bg-warning-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-warning-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <div>
+                  <h3 class="text-base font-semibold text-white mb-1">Local Data Integration</h3>
+                  <p class="text-zinc-500 text-sm">Pulls MLS data, market stats, and neighborhood info for personalized content</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Key Insight -->
+          <div class="space-y-4">
+            <div class="bg-gradient-to-br from-accent-900/30 to-main-900/30 border border-accent-700/30 rounded-xl p-6">
+              <h4 class="text-xs text-accent-400 uppercase tracking-wide mb-3">Core Value Proposition</h4>
+              <p class="text-2xl font-bold text-white mb-4">"Done-for-you marketing that just works"</p>
+              <p class="text-zinc-400 text-sm">roomvu succeeds because agents don't have to create anything—content appears in their feed ready to share.</p>
+            </div>
+
+            <div class="slide-card rounded-xl p-5">
+              <h4 class="text-xs text-zinc-500 uppercase tracking-wide mb-3">Vertical Focus</h4>
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 bg-zinc-800 rounded-lg flex items-center justify-center text-lg">🏠</div>
+                <div>
+                  <p class="text-white font-medium">Real Estate</p>
+                  <p class="text-zinc-500 text-xs">Agents, brokerages, teams</p>
+                </div>
+              </div>
+              <p class="text-zinc-400 text-sm">Deep specialization enables pre-built templates, MLS integrations, and industry-specific content.</p>
+            </div>
+
+            <div class="slide-card rounded-xl p-5">
+              <h4 class="text-xs text-zinc-500 uppercase tracking-wide mb-3">Model Comparison</h4>
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-zinc-400 text-sm">Constant Contact</span>
+                  <span class="text-zinc-300 text-sm">Tools → User creates</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-accent-400 text-sm font-medium">roomvu</span>
+                  <span class="text-white text-sm">Content → User shares</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: Proposed Solution -->
+    <div id="slide-4" class="slide flex-col items-center justify-center max-w-6xl w-full">
+      <div class="w-full text-center">
+        <div class="flex items-center justify-center gap-3 mb-4">
+          <span class="inline-block px-3 py-1 bg-accent-900/50 text-accent-300 rounded-full text-xs font-medium">Recommendation</span>
+        </div>
+        <h2 class="text-4xl font-bold text-white mb-3">AI Content Studio</h2>
+        <p class="text-lg text-zinc-400 mb-10 max-w-2xl mx-auto">A unified content generation experience that combines our BrandKit strength with automated multi-format output</p>
+        
+        <div class="grid grid-cols-4 gap-4 mb-8">
+          <!-- Content Types -->
+          <div class="feature-card rounded-xl p-5 text-center">
+            <div class="w-14 h-14 mx-auto bg-main-500/20 rounded-xl flex items-center justify-center mb-4">
+              <svg class="w-7 h-7 text-main-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </div>
+            <h3 class="text-base font-semibold text-white mb-1">Email</h3>
+            <p class="text-zinc-500 text-xs">Newsletter, promo, announcement</p>
+          </div>
+
+          <div class="feature-card rounded-xl p-5 text-center">
+            <div class="w-14 h-14 mx-auto bg-accent-500/20 rounded-xl flex items-center justify-center mb-4">
+              <svg class="w-7 h-7 text-accent-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+            </div>
+            <h3 class="text-base font-semibold text-white mb-1">Social</h3>
+            <p class="text-zinc-500 text-xs">Facebook, Instagram, LinkedIn</p>
+          </div>
+
+          <div class="feature-card rounded-xl p-5 text-center">
+            <div class="w-14 h-14 mx-auto bg-danger-500/20 rounded-xl flex items-center justify-center mb-4">
+              <svg class="w-7 h-7 text-danger-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+            </div>
+            <h3 class="text-base font-semibold text-white mb-1">Video</h3>
+            <p class="text-zinc-500 text-xs">Promo clips, explainers</p>
+          </div>
+
+          <div class="feature-card rounded-xl p-5 text-center relative">
+            <div class="absolute top-2 right-2">
+              <span class="px-2 py-0.5 bg-warning-500/20 text-warning-400 text-[9px] font-bold rounded-full">BUNDLE</span>
+            </div>
+            <div class="w-14 h-14 mx-auto bg-warning-500/20 rounded-xl flex items-center justify-center mb-4">
+              <svg class="w-7 h-7 text-warning-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+            </div>
+            <h3 class="text-base font-semibold text-white mb-1">Full Campaign</h3>
+            <p class="text-zinc-500 text-xs">All formats in one click</p>
+          </div>
+        </div>
+
+        <!-- Key Differentiator -->
+        <div class="bg-gradient-to-r from-main-900/30 via-accent-900/30 to-warning-900/30 border border-zinc-700/50 rounded-xl p-6">
+          <div class="flex items-center justify-center gap-8">
+            <div class="text-center">
+              <div class="text-3xl font-bold text-white mb-1">1</div>
+              <p class="text-zinc-400 text-xs">Prompt</p>
+            </div>
+            <svg class="w-6 h-6 text-zinc-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-white mb-1">3+</div>
+              <p class="text-zinc-400 text-xs">Formats</p>
+            </div>
+            <svg class="w-6 h-6 text-zinc-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-accent-400 mb-1">Auto</div>
+              <p class="text-zinc-400 text-xs">Brand Applied</p>
+            </div>
+            <svg class="w-6 h-6 text-zinc-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-success-400 mb-1">Ready</div>
+              <p class="text-zinc-400 text-xs">To Publish</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: Campaign Autopilot -->
+    <div id="slide-5" class="slide flex-col items-center justify-center max-w-6xl w-full">
+      <div class="w-full">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-zinc-500 text-sm">Feature Deep Dive</span>
+        </div>
+        <h2 class="text-4xl font-bold text-white mb-2">Campaign Autopilot</h2>
+        <p class="text-lg text-zinc-400 mb-8">Industry-specific content calendars with AI-generated campaigns</p>
+        
+        <div class="grid grid-cols-5 gap-4 mb-8">
+          <!-- Industry Pills -->
+          <div class="slide-card rounded-xl p-4 text-center border-accent-500/50">
+            <div class="text-2xl mb-2">📦</div>
+            <p class="text-white font-medium text-sm">Logistics</p>
+            <p class="text-zinc-500 text-xs">Shipping deadlines</p>
+          </div>
+          <div class="slide-card rounded-xl p-4 text-center">
+            <div class="text-2xl mb-2">🏪</div>
+            <p class="text-white font-medium text-sm">Retail</p>
+            <p class="text-zinc-500 text-xs">Seasonal promos</p>
+          </div>
+          <div class="slide-card rounded-xl p-4 text-center">
+            <div class="text-2xl mb-2">🏠</div>
+            <p class="text-white font-medium text-sm">Real Estate</p>
+            <p class="text-zinc-500 text-xs">Listings, market</p>
+          </div>
+          <div class="slide-card rounded-xl p-4 text-center">
+            <div class="text-2xl mb-2">🍕</div>
+            <p class="text-white font-medium text-sm">Restaurant</p>
+            <p class="text-zinc-500 text-xs">Specials, events</p>
+          </div>
+          <div class="slide-card rounded-xl p-4 text-center">
+            <div class="text-2xl mb-2">💼</div>
+            <p class="text-white font-medium text-sm">Services</p>
+            <p class="text-zinc-500 text-xs">Expertise, tips</p>
+          </div>
+        </div>
+
+        <!-- Calendar Preview -->
+        <div class="slide-card rounded-xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-white">February 2026 — Logistics</h3>
+            <span class="px-3 py-1 bg-accent-500/20 text-accent-300 text-xs font-medium rounded-full">8 suggested campaigns</span>
+          </div>
+          <div class="grid grid-cols-7 gap-2">
+            <!-- Week headers -->
+            <div class="text-center text-xs text-zinc-500 py-2">Sun</div>
+            <div class="text-center text-xs text-zinc-500 py-2">Mon</div>
+            <div class="text-center text-xs text-zinc-500 py-2">Tue</div>
+            <div class="text-center text-xs text-zinc-500 py-2">Wed</div>
+            <div class="text-center text-xs text-zinc-500 py-2">Thu</div>
+            <div class="text-center text-xs text-zinc-500 py-2">Fri</div>
+            <div class="text-center text-xs text-zinc-500 py-2">Sat</div>
+            <!-- Sample days -->
+            <div class="aspect-square rounded-lg bg-zinc-800/50 p-2 relative">
+              <span class="text-xs text-white">1</span>
+              <div class="absolute bottom-1 left-1 right-1 px-1 py-0.5 bg-main-500/30 text-main-300 text-[8px] rounded truncate">🏈 Super Bowl</div>
+            </div>
+            <div class="aspect-square rounded-lg bg-zinc-800/30 p-2"><span class="text-xs text-zinc-400">2</span></div>
+            <div class="aspect-square rounded-lg bg-zinc-800/30 p-2"><span class="text-xs text-zinc-400">3</span></div>
+            <div class="aspect-square rounded-lg bg-zinc-800/30 p-2"><span class="text-xs text-zinc-400">4</span></div>
+            <div class="aspect-square rounded-lg bg-zinc-800/30 p-2"><span class="text-xs text-zinc-400">5</span></div>
+            <div class="aspect-square rounded-lg bg-zinc-800/30 p-2"><span class="text-xs text-zinc-400">6</span></div>
+            <div class="aspect-square rounded-lg bg-zinc-800/30 p-2"><span class="text-xs text-zinc-400">7</span></div>
+            <!-- Week 2 -->
+            <div class="aspect-square rounded-lg bg-zinc-800/30 p-2"><span class="text-xs text-zinc-400">8</span></div>
+            <div class="aspect-square rounded-lg bg-zinc-800/30 p-2"><span class="text-xs text-zinc-400">9</span></div>
+            <div class="aspect-square rounded-lg bg-main-600/20 ring-1 ring-main-500 p-2"><span class="text-xs text-white font-bold">10</span></div>
+            <div class="aspect-square rounded-lg bg-zinc-800/30 p-2"><span class="text-xs text-zinc-400">11</span></div>
+            <div class="aspect-square rounded-lg bg-zinc-800/50 p-2 relative">
+              <span class="text-xs text-white">12</span>
+              <div class="absolute bottom-1 left-1 right-1 px-1 py-0.5 bg-danger-500/30 text-danger-300 text-[8px] rounded truncate">💝 V-Day Rush</div>
+            </div>
+            <div class="aspect-square rounded-lg bg-zinc-800/30 p-2"><span class="text-xs text-zinc-400">13</span></div>
+            <div class="aspect-square rounded-lg bg-zinc-800/50 p-2 relative">
+              <span class="text-xs text-white">14</span>
+              <div class="absolute bottom-1 left-1 right-1 px-1 py-0.5 bg-danger-500/30 text-danger-300 text-[8px] rounded truncate">❤️ Valentine's</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: BrandKit Integration -->
+    <div id="slide-6" class="slide flex-col items-center justify-center max-w-6xl w-full">
+      <div class="w-full">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-zinc-500 text-sm">Competitive Advantage</span>
+        </div>
+        <h2 class="text-4xl font-bold text-white mb-2">BrandKit + AI = <span class="gradient-text-ai">Magic</span></h2>
+        <p class="text-lg text-zinc-400 mb-8">Our existing brand management infrastructure becomes the foundation for automated content</p>
+        
+        <div class="grid grid-cols-2 gap-6">
+          <!-- Left: What we have -->
+          <div class="space-y-4">
+            <div class="slide-card rounded-xl p-5">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 bg-success-500/20 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-success-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <h3 class="text-lg font-semibold text-white">Already Built</h3>
+              </div>
+              <ul class="space-y-3">
+                <li class="flex items-center gap-3 text-sm">
+                  <span class="w-6 h-6 bg-zinc-800 rounded flex items-center justify-center text-xs">✓</span>
+                  <span class="text-zinc-300">Organization & workspace brand kits</span>
+                </li>
+                <li class="flex items-center gap-3 text-sm">
+                  <span class="w-6 h-6 bg-zinc-800 rounded flex items-center justify-center text-xs">✓</span>
+                  <span class="text-zinc-300">Logo, colors, fonts, images</span>
+                </li>
+                <li class="flex items-center gap-3 text-sm">
+                  <span class="w-6 h-6 bg-zinc-800 rounded flex items-center justify-center text-xs">✓</span>
+                  <span class="text-zinc-300">Website scraper for asset extraction</span>
+                </li>
+                <li class="flex items-center gap-3 text-sm">
+                  <span class="w-6 h-6 bg-zinc-800 rounded flex items-center justify-center text-xs">✓</span>
+                  <span class="text-zinc-300">Copy to workspaces workflow</span>
+                </li>
+                <li class="flex items-center gap-3 text-sm">
+                  <span class="w-6 h-6 bg-zinc-800 rounded flex items-center justify-center text-xs">✓</span>
+                  <span class="text-zinc-300">Theme/template system</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Right: What we add -->
+          <div class="space-y-4">
+            <div class="bg-gradient-to-br from-accent-900/30 to-main-900/30 border border-accent-700/30 rounded-xl p-5">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 bg-accent-500/20 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-accent-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                </div>
+                <h3 class="text-lg font-semibold text-white">New Capabilities</h3>
+              </div>
+              <ul class="space-y-3">
+                <li class="flex items-center gap-3 text-sm">
+                  <span class="w-6 h-6 bg-accent-500/30 rounded flex items-center justify-center text-xs text-accent-300">+</span>
+                  <span class="text-zinc-300">AI content generation with brand context</span>
+                </li>
+                <li class="flex items-center gap-3 text-sm">
+                  <span class="w-6 h-6 bg-accent-500/30 rounded flex items-center justify-center text-xs text-accent-300">+</span>
+                  <span class="text-zinc-300">Video template rendering with watermarks</span>
+                </li>
+                <li class="flex items-center gap-3 text-sm">
+                  <span class="w-6 h-6 bg-accent-500/30 rounded flex items-center justify-center text-xs text-accent-300">+</span>
+                  <span class="text-zinc-300">Social graphic auto-generation</span>
+                </li>
+                <li class="flex items-center gap-3 text-sm">
+                  <span class="w-6 h-6 bg-accent-500/30 rounded flex items-center justify-center text-xs text-accent-300">+</span>
+                  <span class="text-zinc-300">Industry-specific campaign templates</span>
+                </li>
+                <li class="flex items-center gap-3 text-sm">
+                  <span class="w-6 h-6 bg-accent-500/30 rounded flex items-center justify-center text-xs text-accent-300">+</span>
+                  <span class="text-zinc-300">Campaign Autopilot scheduling</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Callout -->
+        <div class="mt-6 bg-zinc-900/30 border border-zinc-800 rounded-xl p-5 text-center">
+          <p class="text-zinc-300 text-sm">Unlike roomvu (real estate only), our solution works across <strong class="text-white">all verticals</strong> because it's powered by existing BrandKit infrastructure</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: Implementation Roadmap -->
+    <div id="slide-7" class="slide flex-col items-center justify-center max-w-6xl w-full">
+      <div class="w-full text-center">
+        <div class="flex items-center justify-center gap-3 mb-4">
+          <span class="inline-block px-3 py-1 bg-zinc-800 text-zinc-400 rounded-full text-xs font-medium">Roadmap</span>
+        </div>
+        <h2 class="text-4xl font-bold text-white mb-3">Implementation Phases</h2>
+        <p class="text-lg text-zinc-400 mb-10">Phased rollout to validate and iterate</p>
+        
+        <div class="grid grid-cols-3 gap-6">
+          <!-- Phase 1 -->
+          <div class="phase-card slide-card rounded-xl p-6 text-left" style="--phase-color: #17b26a;">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 bg-success-500/20 rounded-lg flex items-center justify-center text-success-400 font-bold">1</div>
+              <div>
+                <h3 class="text-lg font-semibold text-white">Foundation</h3>
+                <p class="text-xs text-zinc-500">Q1 2026</p>
+              </div>
+            </div>
+            <ul class="space-y-2 text-sm text-zinc-400">
+              <li class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 bg-success-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                AI email content generation
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 bg-success-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                BrandKit auto-application
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 bg-success-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                Quick prompt library
+              </li>
+            </ul>
+            <div class="mt-4 pt-4 border-t border-zinc-700/50">
+              <span class="text-xs text-success-400 font-medium">Low risk • High impact</span>
+            </div>
+          </div>
+
+          <!-- Phase 2 -->
+          <div class="phase-card slide-card rounded-xl p-6 text-left" style="--phase-color: #875bf7;">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 bg-accent-500/20 rounded-lg flex items-center justify-center text-accent-400 font-bold">2</div>
+              <div>
+                <h3 class="text-lg font-semibold text-white">Expansion</h3>
+                <p class="text-xs text-zinc-500">Q2 2026</p>
+              </div>
+            </div>
+            <ul class="space-y-2 text-sm text-zinc-400">
+              <li class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 bg-accent-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                Social graphic generation
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 bg-accent-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                Campaign Autopilot calendar
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 bg-accent-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                Industry vertical selection
+              </li>
+            </ul>
+            <div class="mt-4 pt-4 border-t border-zinc-700/50">
+              <span class="text-xs text-accent-400 font-medium">Medium complexity</span>
+            </div>
+          </div>
+
+          <!-- Phase 3 -->
+          <div class="phase-card slide-card rounded-xl p-6 text-left" style="--phase-color: #f79009;">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 bg-warning-500/20 rounded-lg flex items-center justify-center text-warning-400 font-bold">3</div>
+              <div>
+                <h3 class="text-lg font-semibold text-white">Automation</h3>
+                <p class="text-xs text-zinc-500">Q3-Q4 2026</p>
+              </div>
+            </div>
+            <ul class="space-y-2 text-sm text-zinc-400">
+              <li class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 bg-warning-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                Video template generation
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 bg-warning-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                Full campaign bundles
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 bg-warning-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                External data connectors
+              </li>
+            </ul>
+            <div class="mt-4 pt-4 border-t border-zinc-700/50">
+              <span class="text-xs text-warning-400 font-medium">Highest differentiation</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: Success Metrics -->
+    <div id="slide-8" class="slide flex-col items-center justify-center max-w-6xl w-full">
+      <div class="w-full text-center">
+        <div class="flex items-center justify-center gap-3 mb-4">
+          <span class="inline-block px-3 py-1 bg-zinc-800 text-zinc-400 rounded-full text-xs font-medium">Success Criteria</span>
+        </div>
+        <h2 class="text-4xl font-bold text-white mb-3">How We'll Measure Impact</h2>
+        <p class="text-lg text-zinc-400 mb-10">Key metrics to track adoption and value creation</p>
+        
+        <div class="grid grid-cols-4 gap-5 mb-8">
+          <div class="metric-card rounded-xl p-5 text-center">
+            <div class="text-4xl font-bold text-white mb-2">↓ 60%</div>
+            <p class="text-sm text-zinc-400">Content creation time</p>
+            <p class="text-xs text-zinc-500 mt-2">From 15hrs → 6hrs/week</p>
+          </div>
+          <div class="metric-card rounded-xl p-5 text-center">
+            <div class="text-4xl font-bold text-white mb-2">↑ 3x</div>
+            <p class="text-sm text-zinc-400">Campaign output</p>
+            <p class="text-xs text-zinc-500 mt-2">More campaigns per user</p>
+          </div>
+          <div class="metric-card rounded-xl p-5 text-center">
+            <div class="text-4xl font-bold text-white mb-2">95%</div>
+            <p class="text-sm text-zinc-400">Brand compliance</p>
+            <p class="text-xs text-zinc-500 mt-2">Auto-applied brand assets</p>
+          </div>
+          <div class="metric-card rounded-xl p-5 text-center">
+            <div class="text-4xl font-bold text-white mb-2">↑ 40%</div>
+            <p class="text-sm text-zinc-400">Engagement rate</p>
+            <p class="text-xs text-zinc-500 mt-2">Video + multi-format lift</p>
+          </div>
+        </div>
+
+        <!-- User Quotes -->
+        <div class="grid grid-cols-2 gap-5">
+          <div class="slide-card rounded-xl p-5 text-left">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white font-bold">F</div>
+              <div>
+                <p class="text-white font-medium text-sm">Franchise Owner</p>
+                <p class="text-zinc-500 text-xs">Target persona</p>
+              </div>
+            </div>
+            <p class="text-zinc-300 text-sm italic">"I want marketing that just works without hiring a creative team for every location."</p>
+          </div>
+          <div class="slide-card rounded-xl p-5 text-left">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-main-500 to-main-700 flex items-center justify-center text-white font-bold">M</div>
+              <div>
+                <p class="text-white font-medium text-sm">Marketing Director</p>
+                <p class="text-zinc-500 text-xs">Target persona</p>
+              </div>
+            </div>
+            <p class="text-zinc-300 text-sm italic">"Brand consistency is my nightmare—I need automation that enforces it."</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 9: Prototype Demo -->
+    <div id="slide-9" class="slide flex-col items-center justify-center max-w-6xl w-full">
+      <div class="w-full text-center">
+        <div class="flex items-center justify-center gap-3 mb-4">
+          <span class="inline-block px-3 py-1 bg-success-900/50 text-success-300 rounded-full text-xs font-medium">Live Prototype</span>
+        </div>
+        <h2 class="text-4xl font-bold text-white mb-3">See It In Action</h2>
+        <p class="text-lg text-zinc-400 mb-10">Interactive prototype demonstrating the AI Content Studio experience</p>
+        
+        <!-- Prototype Preview -->
+        <div class="slide-card rounded-xl p-6 mb-8">
+          <div class="aspect-video bg-gradient-to-br from-main-900/50 to-accent-900/50 rounded-xl flex items-center justify-center relative overflow-hidden">
+            <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.03%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-50"></div>
+            <div class="relative z-10 text-center">
+              <div class="w-20 h-20 mx-auto bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 border border-white/20">
+                <svg class="w-8 h-8 text-white ml-1" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+              <p class="text-white font-semibold mb-1">AI Content Studio Prototype</p>
+              <p class="text-zinc-400 text-sm">Click to launch interactive demo</p>
+            </div>
+          </div>
+        </div>
+
+        <a href="ai-content-studio.html" target="_blank" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-main-600 to-accent-600 hover:from-main-500 hover:to-accent-500 text-white rounded-xl font-semibold text-lg transition-all shadow-lg shadow-main-600/25">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+          Launch Prototype
+        </a>
+      </div>
+    </div>
+
+    <!-- Slide 10: Next Steps -->
+    <div id="slide-10" class="slide flex-col items-center justify-center max-w-5xl w-full">
+      <div class="w-full text-center">
+        <div class="flex items-center justify-center gap-3 mb-6">
+          <span class="inline-block px-4 py-1.5 bg-main-900/50 text-main-300 rounded-full text-sm font-medium border border-main-700/50">Recommendation</span>
+        </div>
+        <h2 class="text-5xl font-bold text-white mb-6">Next Steps</h2>
+        
+        <div class="grid grid-cols-3 gap-6 mb-10">
+          <div class="slide-card rounded-xl p-6 text-left">
+            <div class="w-12 h-12 bg-main-500/20 rounded-xl flex items-center justify-center mb-4 text-main-400 font-bold text-xl">1</div>
+            <h3 class="text-lg font-semibold text-white mb-2">Stakeholder Review</h3>
+            <p class="text-zinc-400 text-sm">Present proposal to product and engineering leadership for alignment</p>
+          </div>
+          <div class="slide-card rounded-xl p-6 text-left">
+            <div class="w-12 h-12 bg-accent-500/20 rounded-xl flex items-center justify-center mb-4 text-accent-400 font-bold text-xl">2</div>
+            <h3 class="text-lg font-semibold text-white mb-2">User Research</h3>
+            <p class="text-zinc-400 text-sm">Validate with FML customers—test prototype and gather feedback</p>
+          </div>
+          <div class="slide-card rounded-xl p-6 text-left">
+            <div class="w-12 h-12 bg-success-500/20 rounded-xl flex items-center justify-center mb-4 text-success-400 font-bold text-xl">3</div>
+            <h3 class="text-lg font-semibold text-white mb-2">Technical Scoping</h3>
+            <p class="text-zinc-400 text-sm">Estimate effort for Phase 1 integration with existing AI and BrandKit systems</p>
+          </div>
+        </div>
+
+        <!-- Decision -->
+        <div class="bg-gradient-to-r from-main-900/30 via-accent-900/30 to-success-900/30 border border-zinc-700/50 rounded-xl p-8">
+          <h3 class="text-2xl font-bold text-white mb-3">The Question</h3>
+          <p class="text-xl text-zinc-300 mb-6">Should we build AI Content Studio as a native capability, or integrate roomvu for the real estate vertical first?</p>
+          <div class="flex items-center justify-center gap-6">
+            <div class="px-6 py-3 bg-main-600/20 border border-main-500/50 rounded-xl">
+              <p class="text-main-300 font-semibold">Option A: Build Native</p>
+              <p class="text-zinc-400 text-xs mt-1">Full control, all verticals</p>
+            </div>
+            <span class="text-zinc-500">or</span>
+            <div class="px-6 py-3 bg-accent-600/20 border border-accent-500/50 rounded-xl">
+              <p class="text-accent-300 font-semibold">Option B: Partner First</p>
+              <p class="text-zinc-400 text-xs mt-1">Faster, real estate only</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-10 flex items-center justify-center gap-4">
+          <a href="brands.html" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-medium transition-colors">View BrandKit Prototype</a>
+          <a href="ai-content-studio.html" class="px-6 py-3 bg-main-600 hover:bg-main-500 text-white rounded-xl font-medium transition-colors">Launch AI Studio Demo</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Navigation -->
+  <div class="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur border-t border-zinc-800 py-4 px-8 flex items-center justify-between z-50">
+    <button onclick="prevSlide()" class="flex items-center gap-2 px-4 py-2 text-zinc-400 hover:text-white transition-colors">
+      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+      <span class="text-sm">Previous</span>
+    </button>
+    
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2">
+        <button onclick="goToSlide(1)" class="dot w-2 h-2 rounded-full bg-white transition-colors"></button>
+        <button onclick="goToSlide(2)" class="dot w-2 h-2 rounded-full bg-zinc-700 hover:bg-zinc-500 transition-colors"></button>
+        <button onclick="goToSlide(3)" class="dot w-2 h-2 rounded-full bg-zinc-700 hover:bg-zinc-500 transition-colors"></button>
+        <button onclick="goToSlide(4)" class="dot w-2 h-2 rounded-full bg-zinc-700 hover:bg-zinc-500 transition-colors"></button>
+        <button onclick="goToSlide(5)" class="dot w-2 h-2 rounded-full bg-zinc-700 hover:bg-zinc-500 transition-colors"></button>
+        <button onclick="goToSlide(6)" class="dot w-2 h-2 rounded-full bg-zinc-700 hover:bg-zinc-500 transition-colors"></button>
+        <button onclick="goToSlide(7)" class="dot w-2 h-2 rounded-full bg-zinc-700 hover:bg-zinc-500 transition-colors"></button>
+        <button onclick="goToSlide(8)" class="dot w-2 h-2 rounded-full bg-zinc-700 hover:bg-zinc-500 transition-colors"></button>
+        <button onclick="goToSlide(9)" class="dot w-2 h-2 rounded-full bg-zinc-700 hover:bg-zinc-500 transition-colors"></button>
+        <button onclick="goToSlide(10)" class="dot w-2 h-2 rounded-full bg-zinc-700 hover:bg-zinc-500 transition-colors"></button>
+      </div>
+      <span id="slide-counter" class="text-zinc-500 text-sm ml-4">1 / 10</span>
+    </div>
+    
+    <button onclick="nextSlide()" class="flex items-center gap-2 px-4 py-2 text-zinc-400 hover:text-white transition-colors">
+      <span class="text-sm">Next</span>
+      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 10;
+
+    // Restore slide position
+    const savedSlide = sessionStorage.getItem('roomvuProposalSlide');
+    if (savedSlide) {
+      currentSlide = parseInt(savedSlide);
+      showSlide(currentSlide);
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key >= '1' && e.key <= '9') {
+        goToSlide(parseInt(e.key));
+      } else if (e.key === '0') {
+        goToSlide(10);
+      }
+    });
+
+    function showSlide(n) {
+      document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+      const slideEl = document.getElementById('slide-' + n);
+      if (!slideEl) {
+        n = 1;
+      }
+      const activeSlide = document.getElementById('slide-' + n);
+      activeSlide.classList.add('active');
+      
+      document.getElementById('slide-counter').textContent = n + ' / ' + totalSlides;
+      
+      document.querySelectorAll('.dot').forEach((dot, i) => {
+        if (i + 1 === n) {
+          dot.classList.remove('bg-zinc-700');
+          dot.classList.add('bg-white');
+        } else {
+          dot.classList.remove('bg-white');
+          dot.classList.add('bg-zinc-700');
+        }
+      });
+      
+      currentSlide = n;
+      sessionStorage.setItem('roomvuProposalSlide', n);
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        showSlide(currentSlide + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        showSlide(currentSlide - 1);
+      }
+    }
+
+    function goToSlide(n) {
+      showSlide(n);
+    }
+  </script>
+</body>
+</html>
+

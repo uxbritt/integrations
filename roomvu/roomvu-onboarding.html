@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Get Started — Constant Contact + roomvu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            // Rise-UI Design Tokens
+            main: {
+              50: '#f6fcff', 100: '#e6f8ff', 200: '#d6eafe', 300: '#a6d3fd',
+              400: '#65abff', 500: '#468af1', 600: '#186ded',
+              700: '#085fe2', 800: '#1357be', 900: '#0046ae', 950: '#0b3c85'
+            },
+            neutral: {
+              50: '#fcfcfd', 100: '#f7f9fd', 200: '#f0f4fa', 300: '#dce2ec',
+              400: '#c9d0de', 500: '#8d9bb6', 600: '#6b7492',
+              700: '#63708a', 800: '#5d687e', 900: '#3f4b63', 950: '#313b4d'
+            },
+            success: {
+              50: '#f6fef9', 100: '#ecfdf3', 200: '#dbfae6', 300: '#a9efc5',
+              400: '#75e0a7', 500: '#47cd89', 600: '#17b26a',
+              700: '#079455', 800: '#067647', 900: '#085d3a'
+            },
+            danger: {
+              50: '#fffafa', 100: '#fef3f2', 200: '#fee4e2', 300: '#fecdca',
+              400: '#fda29b', 500: '#fe5a58', 600: '#f04438',
+              700: '#d92d20', 800: '#b42318', 900: '#912018'
+            },
+            warning: {
+              50: '#fffcf5', 100: '#fff8eb', 200: '#fff2de', 300: '#ffdaaf',
+              400: '#ffca8d', 500: '#ffb26b', 600: '#f79009',
+              700: '#e97420', 800: '#d55b03', 900: '#93370d'
+            },
+            accent: {
+              50: '#fbfaff', 100: '#f5f3ff', 200: '#ece9fe', 300: '#ddd6fe',
+              400: '#c3b5fd', 500: '#a48afb', 600: '#875bf7',
+              700: '#7839ee', 800: '#6927da', 900: '#5720b7'
+            },
+            // roomvu brand colors
+            roomvu: {
+              primary: '#FF6B35',
+              secondary: '#1E3A5F',
+              light: '#FFF4F0'
+            }
+          },
+          fontFamily: {
+            sans: ['CTSans', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @font-face {
+      font-family: 'CTSans';
+      src: url('fonts/CTSans-Regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'CTSans';
+      src: url('fonts/CTSans-Semibold.woff2') format('woff2');
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'CTSans';
+      src: url('fonts/CTSans-Bold.woff2') format('woff2');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f7f9fd 0%, #e6f8ff 50%, #f5f3ff 100%);
+      min-height: 100vh;
+    }
+
+    .step {
+      display: none;
+      animation: fadeIn 0.4s ease-out;
+    }
+    .step.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .gradient-border {
+      background: linear-gradient(135deg, #186ded, #FF6B35);
+      padding: 2px;
+      border-radius: 1rem;
+    }
+    .gradient-border-inner {
+      background: white;
+      border-radius: calc(1rem - 2px);
+    }
+
+    .industry-card {
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .industry-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+    .industry-card.selected {
+      border-color: #186ded;
+      background: #f6fcff;
+    }
+    .industry-card.selected .card-check {
+      display: flex;
+    }
+
+    .feature-check {
+      transition: all 0.15s ease;
+    }
+    .feature-check:hover {
+      background: #f0f4fa;
+    }
+
+    .progress-step {
+      transition: all 0.3s ease;
+    }
+    .progress-step.completed .step-circle {
+      background: #17b26a;
+      border-color: #17b26a;
+    }
+    .progress-step.completed .step-circle svg {
+      display: block;
+    }
+    .progress-step.completed .step-number {
+      display: none;
+    }
+    .progress-step.active .step-circle {
+      background: #186ded;
+      border-color: #186ded;
+      color: white;
+    }
+    .progress-step .step-line {
+      background: #dce2ec;
+    }
+    .progress-step.completed .step-line {
+      background: #17b26a;
+    }
+
+    .brand-card {
+      transition: all 0.2s ease;
+    }
+    .brand-card:hover {
+      transform: scale(1.02);
+    }
+
+    .pulse-ring {
+      animation: pulse-ring 2s infinite;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.5; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body class="font-sans">
+  
+  <!-- Header -->
+  <header class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-neutral-100 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <!-- Co-branded logos -->
+      <div class="flex items-center gap-3">
+        <img src="assets/ctctLogo.png" alt="Constant Contact" class="h-8 object-contain">
+        <div class="flex items-center gap-1.5 text-neutral-300">
+          <span class="text-lg">+</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF6B35] to-[#FF8F66] flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+          </div>
+          <span class="font-semibold text-[#1E3A5F]">roomvu</span>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-4">
+        <span class="text-sm text-neutral-500">Already have an account?</span>
+        <a href="#" class="text-sm text-main-600 hover:text-main-700 font-medium">Sign in</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Progress Bar -->
+  <div class="fixed top-[72px] left-0 right-0 bg-white border-b border-neutral-100 z-40">
+    <div class="max-w-2xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <!-- Step 1 -->
+        <div class="progress-step flex items-center gap-3 active" data-step="1">
+          <div class="step-circle w-8 h-8 rounded-full border-2 border-main-600 bg-main-600 text-white flex items-center justify-center text-sm font-semibold">
+            <span class="step-number">1</span>
+            <svg class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <span class="text-sm font-medium text-neutral-900">Account</span>
+        </div>
+        
+        <div class="flex-1 h-0.5 mx-4 step-line bg-neutral-200 progress-step" data-step="1"></div>
+        
+        <!-- Step 2 -->
+        <div class="progress-step flex items-center gap-3" data-step="2">
+          <div class="step-circle w-8 h-8 rounded-full border-2 border-neutral-300 bg-white text-neutral-500 flex items-center justify-center text-sm font-semibold">
+            <span class="step-number">2</span>
+            <svg class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <span class="text-sm font-medium text-neutral-500">Industry</span>
+        </div>
+        
+        <div class="flex-1 h-0.5 mx-4 step-line bg-neutral-200 progress-step" data-step="2"></div>
+        
+        <!-- Step 3 -->
+        <div class="progress-step flex items-center gap-3" data-step="3">
+          <div class="step-circle w-8 h-8 rounded-full border-2 border-neutral-300 bg-white text-neutral-500 flex items-center justify-center text-sm font-semibold">
+            <span class="step-number">3</span>
+            <svg class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <span class="text-sm font-medium text-neutral-500">Brand</span>
+        </div>
+        
+        <div class="flex-1 h-0.5 mx-4 step-line bg-neutral-200 progress-step" data-step="3"></div>
+        
+        <!-- Step 4 -->
+        <div class="progress-step flex items-center gap-3" data-step="4">
+          <div class="step-circle w-8 h-8 rounded-full border-2 border-neutral-300 bg-white text-neutral-500 flex items-center justify-center text-sm font-semibold">
+            <span class="step-number">4</span>
+            <svg class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <span class="text-sm font-medium text-neutral-500">Connect</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="pt-40 pb-12 px-6">
+    <div class="max-w-2xl mx-auto">
+      
+      <!-- Step 1: Create Account -->
+      <div id="step-1" class="step active">
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-main-100 to-[#FFF4F0] rounded-full mb-4">
+            <span class="text-sm font-medium text-main-700">Constant Contact</span>
+            <span class="text-neutral-400">×</span>
+            <span class="text-sm font-medium text-[#FF6B35]">roomvu</span>
+          </div>
+          <h1 class="text-3xl font-bold text-neutral-900 mb-3">Create your account</h1>
+          <p class="text-neutral-500">Get started with AI-powered video marketing for your business</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-neutral-100 p-8">
+          <form onsubmit="event.preventDefault(); nextStep();">
+            <div class="space-y-5">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-neutral-700 mb-2">First name</label>
+                  <input type="text" placeholder="John" class="w-full px-4 py-3 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-main-500 focus:border-transparent">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-neutral-700 mb-2">Last name</label>
+                  <input type="text" placeholder="Smith" class="w-full px-4 py-3 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-main-500 focus:border-transparent">
+                </div>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-neutral-700 mb-2">Email address</label>
+                <input type="email" placeholder="john@company.com" class="w-full px-4 py-3 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-main-500 focus:border-transparent">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-neutral-700 mb-2">Password</label>
+                <input type="password" placeholder="Create a password" class="w-full px-4 py-3 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-main-500 focus:border-transparent">
+                <p class="text-xs text-neutral-400 mt-2">At least 8 characters with a number and symbol</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-neutral-700 mb-2">Company name</label>
+                <input type="text" placeholder="Acme Real Estate" class="w-full px-4 py-3 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-main-500 focus:border-transparent">
+              </div>
+            </div>
+
+            <div class="mt-6 flex items-start gap-3">
+              <input type="checkbox" id="terms" class="mt-1 w-4 h-4 rounded border-neutral-300 text-main-600 focus:ring-main-500">
+              <label for="terms" class="text-sm text-neutral-500">
+                I agree to the <a href="#" class="text-main-600 hover:underline">Terms of Service</a> and <a href="#" class="text-main-600 hover:underline">Privacy Policy</a>
+              </label>
+            </div>
+
+            <button type="submit" class="w-full mt-8 px-6 py-4 bg-gradient-to-r from-main-600 to-[#FF6B35] hover:from-main-500 hover:to-[#FF7F4D] text-white rounded-xl font-semibold text-sm transition-all shadow-lg">
+              Create Account
+            </button>
+          </form>
+
+          <div class="mt-6 pt-6 border-t border-neutral-100">
+            <p class="text-center text-sm text-neutral-500 mb-4">Or sign up with</p>
+            <div class="grid grid-cols-2 gap-3">
+              <button class="flex items-center justify-center gap-2 px-4 py-3 border border-neutral-200 rounded-xl hover:bg-neutral-50 transition-colors">
+                <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                <span class="text-sm font-medium text-neutral-700">Google</span>
+              </button>
+              <button class="flex items-center justify-center gap-2 px-4 py-3 border border-neutral-200 rounded-xl hover:bg-neutral-50 transition-colors">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                <span class="text-sm font-medium text-neutral-700">Facebook</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Select Industry -->
+      <div id="step-2" class="step">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-bold text-neutral-900 mb-3">What's your industry?</h1>
+          <p class="text-neutral-500">We'll customize your content templates and campaign suggestions</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-8">
+          <!-- Real Estate -->
+          <div onclick="selectIndustry(this, 'realestate')" class="industry-card bg-white rounded-2xl border-2 border-neutral-200 p-6 relative">
+            <div class="card-check hidden absolute top-3 right-3 w-6 h-6 bg-main-600 rounded-full items-center justify-center">
+              <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <div class="text-4xl mb-3">🏠</div>
+            <h3 class="font-semibold text-neutral-900 mb-1">Real Estate</h3>
+            <p class="text-sm text-neutral-500">Agents, brokers, property managers</p>
+            <div class="mt-4 flex items-center gap-2">
+              <span class="px-2 py-1 bg-[#FF6B35]/10 text-[#FF6B35] text-xs font-medium rounded-full">roomvu Optimized</span>
+            </div>
+          </div>
+
+          <!-- Franchise -->
+          <div onclick="selectIndustry(this, 'franchise')" class="industry-card bg-white rounded-2xl border-2 border-neutral-200 p-6 relative">
+            <div class="card-check hidden absolute top-3 right-3 w-6 h-6 bg-main-600 rounded-full items-center justify-center">
+              <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <div class="text-4xl mb-3">🏪</div>
+            <h3 class="font-semibold text-neutral-900 mb-1">Franchise / Retail</h3>
+            <p class="text-sm text-neutral-500">Multi-location businesses</p>
+          </div>
+
+          <!-- Restaurant -->
+          <div onclick="selectIndustry(this, 'restaurant')" class="industry-card bg-white rounded-2xl border-2 border-neutral-200 p-6 relative">
+            <div class="card-check hidden absolute top-3 right-3 w-6 h-6 bg-main-600 rounded-full items-center justify-center">
+              <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <div class="text-4xl mb-3">🍕</div>
+            <h3 class="font-semibold text-neutral-900 mb-1">Restaurant / Food</h3>
+            <p class="text-sm text-neutral-500">Restaurants, cafes, food service</p>
+          </div>
+
+          <!-- Professional Services -->
+          <div onclick="selectIndustry(this, 'services')" class="industry-card bg-white rounded-2xl border-2 border-neutral-200 p-6 relative">
+            <div class="card-check hidden absolute top-3 right-3 w-6 h-6 bg-main-600 rounded-full items-center justify-center">
+              <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <div class="text-4xl mb-3">💼</div>
+            <h3 class="font-semibold text-neutral-900 mb-1">Professional Services</h3>
+            <p class="text-sm text-neutral-500">Consulting, legal, finance</p>
+          </div>
+
+          <!-- Healthcare -->
+          <div onclick="selectIndustry(this, 'healthcare')" class="industry-card bg-white rounded-2xl border-2 border-neutral-200 p-6 relative">
+            <div class="card-check hidden absolute top-3 right-3 w-6 h-6 bg-main-600 rounded-full items-center justify-center">
+              <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <div class="text-4xl mb-3">🏥</div>
+            <h3 class="font-semibold text-neutral-900 mb-1">Healthcare</h3>
+            <p class="text-sm text-neutral-500">Medical, dental, wellness</p>
+          </div>
+
+          <!-- Other -->
+          <div onclick="selectIndustry(this, 'other')" class="industry-card bg-white rounded-2xl border-2 border-neutral-200 p-6 relative">
+            <div class="card-check hidden absolute top-3 right-3 w-6 h-6 bg-main-600 rounded-full items-center justify-center">
+              <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <div class="text-4xl mb-3">✨</div>
+            <h3 class="font-semibold text-neutral-900 mb-1">Other</h3>
+            <p class="text-sm text-neutral-500">Something else entirely</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <button onclick="prevStep()" class="px-6 py-4 text-neutral-600 hover:bg-neutral-100 rounded-xl font-medium text-sm transition-colors">
+            Back
+          </button>
+          <button onclick="nextStep()" class="flex-1 px-6 py-4 bg-gradient-to-r from-main-600 to-[#FF6B35] hover:from-main-500 hover:to-[#FF7F4D] text-white rounded-xl font-semibold text-sm transition-all shadow-lg">
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Brand Setup -->
+      <div id="step-3" class="step">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-bold text-neutral-900 mb-3">Set up your brand</h1>
+          <p class="text-neutral-500">We'll use these assets to create on-brand content automatically</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-neutral-100 p-8 mb-6">
+          <!-- Website Scanner -->
+          <div class="mb-8">
+            <label class="block text-sm font-medium text-neutral-700 mb-3">Import from your website</label>
+            <div class="flex gap-3">
+              <div class="flex-1 relative">
+                <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                  <svg class="w-5 h-5 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                <input type="url" placeholder="https://yourwebsite.com" class="w-full pl-12 pr-4 py-3 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-main-500 focus:border-transparent">
+              </div>
+              <button onclick="scanWebsite()" class="px-6 py-3 bg-main-600 hover:bg-main-700 text-white rounded-xl font-medium text-sm transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                Scan
+              </button>
+            </div>
+            <p class="text-xs text-neutral-400 mt-2">We'll extract your logo, colors, and fonts automatically</p>
+          </div>
+
+          <!-- Scanned Results (Hidden initially) -->
+          <div id="scan-results" class="hidden">
+            <div class="p-4 bg-success-50 border border-success-200 rounded-xl mb-6 flex items-center gap-3">
+              <div class="w-8 h-8 bg-success-100 rounded-full flex items-center justify-center">
+                <svg class="w-5 h-5 text-success-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-success-800">Brand assets detected!</p>
+                <p class="text-xs text-success-600">We found your logo, 5 colors, and brand fonts</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-6">
+              <!-- Logo -->
+              <div class="p-4 border border-neutral-200 rounded-xl">
+                <p class="text-xs text-neutral-500 mb-2">Logo</p>
+                <div class="w-16 h-16 bg-neutral-100 rounded-lg flex items-center justify-center">
+                  <div class="w-12 h-12 bg-gradient-to-br from-main-500 to-main-600 rounded-lg flex items-center justify-center text-white font-bold">AR</div>
+                </div>
+              </div>
+              
+              <!-- Colors -->
+              <div class="p-4 border border-neutral-200 rounded-xl">
+                <p class="text-xs text-neutral-500 mb-2">Colors</p>
+                <div class="flex gap-2">
+                  <div class="w-8 h-8 rounded-lg bg-main-600"></div>
+                  <div class="w-8 h-8 rounded-lg bg-neutral-900"></div>
+                  <div class="w-8 h-8 rounded-lg bg-[#FF6B35]"></div>
+                  <div class="w-8 h-8 rounded-lg bg-neutral-100 border border-neutral-200"></div>
+                </div>
+              </div>
+              
+              <!-- Font -->
+              <div class="p-4 border border-neutral-200 rounded-xl">
+                <p class="text-xs text-neutral-500 mb-2">Font</p>
+                <p class="text-lg font-semibold text-neutral-900">Inter</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Manual Upload -->
+          <div class="border-t border-neutral-100 pt-6">
+            <p class="text-sm text-neutral-500 mb-4">Or upload manually</p>
+            <div class="flex gap-4">
+              <button class="flex-1 p-4 border-2 border-dashed border-neutral-200 rounded-xl hover:border-main-300 hover:bg-main-50/50 transition-colors text-center">
+                <svg class="w-8 h-8 text-neutral-400 mx-auto mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                <p class="text-sm font-medium text-neutral-700">Upload Logo</p>
+                <p class="text-xs text-neutral-400">PNG, SVG, or JPG</p>
+              </button>
+              <button class="flex-1 p-4 border-2 border-dashed border-neutral-200 rounded-xl hover:border-main-300 hover:bg-main-50/50 transition-colors text-center">
+                <svg class="w-8 h-8 text-neutral-400 mx-auto mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/></svg>
+                <p class="text-sm font-medium text-neutral-700">Pick Colors</p>
+                <p class="text-xs text-neutral-400">Enter hex codes</p>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <button onclick="prevStep()" class="px-6 py-4 text-neutral-600 hover:bg-neutral-100 rounded-xl font-medium text-sm transition-colors">
+            Back
+          </button>
+          <button onclick="nextStep()" class="flex-1 px-6 py-4 bg-gradient-to-r from-main-600 to-[#FF6B35] hover:from-main-500 hover:to-[#FF7F4D] text-white rounded-xl font-semibold text-sm transition-all shadow-lg">
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 4: Connect roomvu -->
+      <div id="step-4" class="step">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-bold text-neutral-900 mb-3">Connect roomvu</h1>
+          <p class="text-neutral-500">Link your roomvu account to unlock AI video marketing</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-neutral-100 p-8 mb-6">
+          <!-- roomvu Benefits -->
+          <div class="mb-8">
+            <div class="flex items-center gap-4 mb-6">
+              <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-[#FF6B35] to-[#FF8F66] flex items-center justify-center">
+                <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-neutral-900">roomvu Video Marketing</h3>
+                <p class="text-sm text-neutral-500">Automated video content for your business</p>
+              </div>
+            </div>
+
+            <div class="space-y-3 mb-6">
+              <div class="flex items-center gap-3 p-3 bg-neutral-50 rounded-xl">
+                <div class="w-8 h-8 bg-success-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-4 h-4 text-success-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-neutral-900">Auto-generated videos</p>
+                  <p class="text-xs text-neutral-500">Market updates, tips, and promotional content</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 p-3 bg-neutral-50 rounded-xl">
+                <div class="w-8 h-8 bg-success-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-4 h-4 text-success-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-neutral-900">Brand watermarking</p>
+                  <p class="text-xs text-neutral-500">Your logo on every video automatically</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 p-3 bg-neutral-50 rounded-xl">
+                <div class="w-8 h-8 bg-success-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-4 h-4 text-success-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-neutral-900">Social auto-posting</p>
+                  <p class="text-xs text-neutral-500">Schedule to Facebook, Instagram, YouTube</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Connect Options -->
+          <div class="space-y-4">
+            <button onclick="connectRoomvu()" class="w-full p-4 bg-gradient-to-r from-[#FF6B35] to-[#FF8F66] hover:from-[#FF7F4D] hover:to-[#FFA080] text-white rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-3">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+              Connect Existing roomvu Account
+            </button>
+            
+            <div class="relative">
+              <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-neutral-200"></div>
+              </div>
+              <div class="relative flex justify-center">
+                <span class="px-4 bg-white text-sm text-neutral-400">or</span>
+              </div>
+            </div>
+
+            <button class="w-full p-4 border-2 border-[#FF6B35] text-[#FF6B35] hover:bg-[#FFF4F0] rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-3">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+              Create New roomvu Account
+            </button>
+
+            <button onclick="skipRoomvu()" class="w-full p-4 text-neutral-500 hover:bg-neutral-50 rounded-xl font-medium text-sm transition-colors">
+              Skip for now — I'll connect later
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <button onclick="prevStep()" class="px-6 py-4 text-neutral-600 hover:bg-neutral-100 rounded-xl font-medium text-sm transition-colors">
+            Back
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 5: Success -->
+      <div id="step-5" class="step">
+        <div class="text-center">
+          <div class="w-24 h-24 mx-auto mb-6 relative">
+            <div class="absolute inset-0 bg-success-200 rounded-full pulse-ring"></div>
+            <div class="relative w-24 h-24 bg-success-500 rounded-full flex items-center justify-center">
+              <svg class="w-12 h-12 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+          </div>
+          
+          <h1 class="text-3xl font-bold text-neutral-900 mb-3">You're all set! 🎉</h1>
+          <p class="text-neutral-500 mb-8">Your account is ready with AI-powered video marketing</p>
+
+          <div class="bg-white rounded-2xl shadow-sm border border-neutral-100 p-8 mb-8">
+            <h3 class="text-lg font-semibold text-neutral-900 mb-4">What's included</h3>
+            <div class="grid grid-cols-2 gap-4 text-left">
+              <div class="flex items-start gap-3">
+                <div class="w-6 h-6 bg-main-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-3.5 h-3.5 text-main-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-neutral-900">AI Content Studio</p>
+                  <p class="text-xs text-neutral-500">Generate email, social & video</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-6 h-6 bg-[#FF6B35]/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-3.5 h-3.5 text-[#FF6B35]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-neutral-900">roomvu Videos</p>
+                  <p class="text-xs text-neutral-500">Automated video content</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-6 h-6 bg-accent-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-3.5 h-3.5 text-accent-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-neutral-900">Campaign Autopilot</p>
+                  <p class="text-xs text-neutral-500">Pre-built campaign calendar</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-6 h-6 bg-success-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-3.5 h-3.5 text-success-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-neutral-900">Brand Kit</p>
+                  <p class="text-xs text-neutral-500">Auto-applied to all content</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <a href="ai-content-studio.html" class="inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-main-600 to-[#FF6B35] hover:from-main-500 hover:to-[#FF7F4D] text-white rounded-xl font-semibold text-sm transition-all shadow-lg">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.2 2.2m8.4 8.4 2.2 2.2M5.6 18.4l2.2-2.2m8.4-8.4 2.2-2.2"/><circle cx="12" cy="12" r="4"/></svg>
+            Go to AI Content Studio
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    let currentStep = 1;
+    const totalSteps = 5;
+
+    function nextStep() {
+      if (currentStep < totalSteps) {
+        currentStep++;
+        updateStep();
+      }
+    }
+
+    function prevStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        updateStep();
+      }
+    }
+
+    function updateStep() {
+      // Hide all steps
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      
+      // Show current step
+      const stepEl = document.getElementById('step-' + currentStep);
+      if (stepEl) stepEl.classList.add('active');
+
+      // Update progress indicators
+      document.querySelectorAll('.progress-step').forEach(el => {
+        const stepNum = parseInt(el.dataset.step);
+        if (!stepNum) return;
+        
+        el.classList.remove('completed', 'active');
+        
+        if (stepNum < currentStep) {
+          el.classList.add('completed');
+        } else if (stepNum === currentStep) {
+          el.classList.add('active');
+        }
+      });
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function selectIndustry(element, industry) {
+      document.querySelectorAll('.industry-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      element.classList.add('selected');
+    }
+
+    function scanWebsite() {
+      const results = document.getElementById('scan-results');
+      results.classList.remove('hidden');
+      results.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function connectRoomvu() {
+      // Simulate connection
+      currentStep = 5;
+      updateStep();
+    }
+
+    function skipRoomvu() {
+      currentStep = 5;
+      updateStep();
+    }
+  </script>
+</body>
+</html>
+
