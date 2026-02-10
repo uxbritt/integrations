@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>roomvu Integration — Short-Term Experiments</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            main: {
+              50: '#f6fcff', 100: '#e6f8ff', 200: '#d6eafe', 300: '#a6d3fd',
+              400: '#65abff', 500: '#468af1', 600: '#186ded',
+              700: '#085fe2', 800: '#1357be', 900: '#0046ae', 950: '#0b3c85'
+            },
+            neutral: {
+              50: '#fcfcfd', 100: '#f7f9fd', 200: '#f0f4fa', 300: '#dce2ec',
+              400: '#c9d0de', 500: '#8d9bb6', 600: '#6b7492',
+              700: '#63708a', 800: '#5d687e', 900: '#3f4b63', 950: '#313b4d'
+            },
+            roomvu: {
+              primary: '#FF6B35',
+              secondary: '#1E3A5F'
+            }
+          },
+          fontFamily: {
+            sans: ['CTSans', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @font-face {
+      font-family: 'CTSans';
+      src: url('../prototypes/fonts/CTSans-Regular.woff2') format('woff2');
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: 'CTSans';
+      src: url('../prototypes/fonts/CTSans-Semibold.woff2') format('woff2');
+      font-weight: 600;
+    }
+    @font-face {
+      font-family: 'CTSans';
+      src: url('../prototypes/fonts/CTSans-Bold.woff2') format('woff2');
+      font-weight: 700;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      min-height: 100vh;
+    }
+
+    .slide {
+      display: none;
+      animation: fadeIn 0.4s ease-out;
+    }
+    .slide.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #FF6B35 0%, #FF8F66 50%, #FFB088 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .gradient-text-blue {
+      background: linear-gradient(135deg, #186ded 0%, #65abff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .card-glow {
+      box-shadow: 0 0 60px rgba(255, 107, 53, 0.15);
+    }
+
+    .card-glow-blue {
+      box-shadow: 0 0 60px rgba(24, 109, 237, 0.15);
+    }
+
+    .option-card {
+      transition: all 0.3s ease;
+    }
+    .option-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .metric-ring {
+      background: conic-gradient(#FF6B35 0deg, #FF6B35 var(--progress), #334155 var(--progress), #334155 360deg);
+    }
+
+    .funnel-step {
+      position: relative;
+    }
+    .funnel-step::after {
+      content: '';
+      position: absolute;
+      right: -24px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 12px solid #FF6B35;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+    }
+    .funnel-step:last-child::after {
+      display: none;
+    }
+
+    .timeline-dot {
+      position: relative;
+    }
+    .timeline-dot::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 40px;
+      background: linear-gradient(to bottom, #FF6B35, transparent);
+    }
+    .timeline-dot:last-child::before {
+      display: none;
+    }
+  </style>
+</head>
+<body class="font-sans text-white overflow-hidden">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-gradient-to-br from-[#FF6B35] to-[#FF8F66] rounded-lg flex items-center justify-center">
+        <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+      </div>
+      <span class="text-sm font-medium text-white/70">roomvu Integration</span>
+      <span class="text-white/30 mx-2">•</span>
+      <span class="text-sm font-medium text-[#FF6B35]">Short-Term Experiments</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <span id="slide-counter" class="text-sm text-white/50"></span>
+      <div class="flex gap-2">
+        <button onclick="prevSlide()" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <button onclick="nextSlide()" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Slides Container -->
+  <div id="slides" class="h-screen pt-16">
+
+    <!-- Slide 1: Title -->
+    <section class="slide active h-full flex-col items-center justify-center px-8">
+      <div class="text-center max-w-4xl mx-auto">
+        <div class="inline-flex items-center gap-2 px-4 py-2 bg-[#FF6B35]/10 border border-[#FF6B35]/30 rounded-full mb-8">
+          <svg class="w-4 h-4 text-[#FF6B35]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+          <span class="text-sm text-[#FF6B35] font-medium">roomvu × Constant Contact</span>
+        </div>
+        <h1 class="text-6xl font-bold mb-6">
+          <span class="gradient-text">Short-Term Experiments</span>
+        </h1>
+        <p class="text-xl text-white/60 mb-12 max-w-2xl mx-auto">
+          Testing integration hypotheses with minimal engineering investment to validate demand signals before deeper product commitment.
+        </p>
+        <div class="flex items-center justify-center gap-6">
+          <div class="flex items-center gap-3 px-5 py-3 bg-white/5 rounded-xl border border-white/10">
+            <div class="w-10 h-10 bg-[#FF6B35]/20 rounded-lg flex items-center justify-center">
+              <span class="text-lg font-bold text-[#FF6B35]">1</span>
+            </div>
+            <div class="text-left">
+              <p class="text-sm text-white/50">Option 1</p>
+              <p class="font-medium">AI Content Promotion</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 px-5 py-3 bg-white/5 rounded-xl border border-white/10">
+            <div class="w-10 h-10 bg-main-600/20 rounded-lg flex items-center justify-center">
+              <span class="text-lg font-bold text-main-400">2</span>
+            </div>
+            <div class="text-left">
+              <p class="text-sm text-white/50">Option 2</p>
+              <p class="font-medium">Lead Gen Funnel</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 2: Hypothesis -->
+    <section class="slide h-full flex-col items-center justify-center px-8">
+      <div class="max-w-5xl mx-auto w-full">
+        <div class="text-center mb-12">
+          <p class="text-[#FF6B35] text-sm font-medium uppercase tracking-wide mb-3">The Hypothesis</p>
+          <h2 class="text-4xl font-bold mb-4">Real estate agents will engage more with AI-generated video content than static templates</h2>
+        </div>
+
+        <div class="grid grid-cols-3 gap-6">
+          <div class="p-6 bg-white/5 rounded-2xl border border-white/10">
+            <div class="w-12 h-12 bg-[#FF6B35]/20 rounded-xl flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-[#FF6B35]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <h3 class="font-semibold text-lg mb-2">Time to Value</h3>
+            <p class="text-white/60 text-sm">Agents spend hours creating content. roomvu automates this with localized market data videos.</p>
+          </div>
+
+          <div class="p-6 bg-white/5 rounded-2xl border border-white/10">
+            <div class="w-12 h-12 bg-[#FF6B35]/20 rounded-xl flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-[#FF6B35]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <h3 class="font-semibold text-lg mb-2">Differentiation</h3>
+            <p class="text-white/60 text-sm">Video content drives 3x engagement vs. static emails. We can offer this without building it.</p>
+          </div>
+
+          <div class="p-6 bg-white/5 rounded-2xl border border-white/10">
+            <div class="w-12 h-12 bg-[#FF6B35]/20 rounded-xl flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-[#FF6B35]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <h3 class="font-semibold text-lg mb-2">Revenue Signal</h3>
+            <p class="text-white/60 text-sm">Test willingness to pay for premium AI content before committing to deeper integration.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 3: Option 1 Overview -->
+    <section class="slide h-full flex-col items-center justify-center px-8">
+      <div class="max-w-5xl mx-auto w-full">
+        <div class="flex items-start gap-4 mb-8">
+          <div class="w-14 h-14 bg-gradient-to-br from-[#FF6B35] to-[#FF8F66] rounded-2xl flex items-center justify-center flex-shrink-0">
+            <span class="text-2xl font-bold">1</span>
+          </div>
+          <div>
+            <p class="text-[#FF6B35] text-sm font-medium uppercase tracking-wide mb-1">Option 1</p>
+            <h2 class="text-4xl font-bold">Promote AI Content Generation</h2>
+            <p class="text-white/60 mt-2">Powered by roomvu • Integrated into Email Editor</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-8">
+          <div class="space-y-4">
+            <div class="p-5 bg-white/5 rounded-xl border border-white/10">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 bg-[#FF6B35]/20 rounded-lg flex items-center justify-center">
+                  <svg class="w-4 h-4 text-[#FF6B35]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+                </div>
+                <h3 class="font-semibold">Video Content Block</h3>
+              </div>
+              <p class="text-sm text-white/60">New content block in email editor for inserting roomvu videos directly into campaigns.</p>
+            </div>
+
+            <div class="p-5 bg-white/5 rounded-xl border border-white/10">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 bg-[#FF6B35]/20 rounded-lg flex items-center justify-center">
+                  <svg class="w-4 h-4 text-[#FF6B35]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                </div>
+                <h3 class="font-semibold">Market Update Videos</h3>
+              </div>
+              <p class="text-sm text-white/60">Auto-generated local market data videos branded with agent info.</p>
+            </div>
+
+            <div class="p-5 bg-white/5 rounded-xl border border-white/10">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 bg-[#FF6B35]/20 rounded-lg flex items-center justify-center">
+                  <svg class="w-4 h-4 text-[#FF6B35]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.2 2.2m8.4 8.4 2.2 2.2"/><circle cx="12" cy="12" r="4"/></svg>
+                </div>
+                <h3 class="font-semibold">"Powered by roomvu" Badge</h3>
+              </div>
+              <p class="text-sm text-white/60">Partner attribution drives awareness and trust in AI capabilities.</p>
+            </div>
+          </div>
+
+          <div class="card-glow bg-gradient-to-br from-[#1E3A5F] to-[#0f172a] rounded-2xl p-6 border border-white/10">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-white/50">Email Editor Preview</span>
+              <a href="../prototypes/email-editor-roomvu.html" target="_blank" class="flex items-center gap-2 px-3 py-1.5 bg-[#FF6B35] hover:bg-[#FF7F4D] rounded-lg text-sm font-medium transition-colors">
+                View Prototype
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+              </a>
+            </div>
+            <div class="bg-[#0f172a] rounded-xl p-4 border border-white/10">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 bg-[#FF6B35] rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+                </div>
+                <div>
+                  <p class="font-medium text-sm">Insert Video</p>
+                  <p class="text-xs text-white/50">Add roomvu video thumbnail</p>
+                </div>
+              </div>
+              <div class="aspect-video bg-gradient-to-br from-[#1E3A5F] to-[#FF6B35] rounded-lg flex items-center justify-center relative">
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white ml-1" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+                <div class="absolute bottom-2 right-2 px-2 py-1 bg-black/30 rounded-full text-[10px]">roomvu</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 4: Option 1 Metrics -->
+    <section class="slide h-full flex-col items-center justify-center px-8">
+      <div class="max-w-5xl mx-auto w-full">
+        <div class="text-center mb-12">
+          <p class="text-[#FF6B35] text-sm font-medium uppercase tracking-wide mb-3">Option 1 • Success Metrics</p>
+          <h2 class="text-4xl font-bold">Signals We're Looking For</h2>
+        </div>
+
+        <div class="grid grid-cols-4 gap-6">
+          <div class="p-6 bg-white/5 rounded-2xl border border-white/10 text-center">
+            <div class="w-20 h-20 mx-auto mb-4 rounded-full metric-ring flex items-center justify-center" style="--progress: 270deg;">
+              <div class="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center">
+                <span class="text-2xl font-bold text-[#FF6B35]">15%</span>
+              </div>
+            </div>
+            <h3 class="font-semibold mb-1">Adoption Rate</h3>
+            <p class="text-sm text-white/50">Real estate users who try video block</p>
+          </div>
+
+          <div class="p-6 bg-white/5 rounded-2xl border border-white/10 text-center">
+            <div class="w-20 h-20 mx-auto mb-4 rounded-full metric-ring flex items-center justify-center" style="--progress: 180deg;">
+              <div class="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center">
+                <span class="text-2xl font-bold text-[#FF6B35]">2x</span>
+              </div>
+            </div>
+            <h3 class="font-semibold mb-1">Click-through</h3>
+            <p class="text-sm text-white/50">vs. static image emails</p>
+          </div>
+
+          <div class="p-6 bg-white/5 rounded-2xl border border-white/10 text-center">
+            <div class="w-20 h-20 mx-auto mb-4 rounded-full metric-ring flex items-center justify-center" style="--progress: 216deg;">
+              <div class="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center">
+                <span class="text-2xl font-bold text-[#FF6B35]">40%</span>
+              </div>
+            </div>
+            <h3 class="font-semibold mb-1">Video Views</h3>
+            <p class="text-sm text-white/50">Recipients who click play</p>
+          </div>
+
+          <div class="p-6 bg-white/5 rounded-2xl border border-white/10 text-center">
+            <div class="w-20 h-20 mx-auto mb-4 rounded-full metric-ring flex items-center justify-center" style="--progress: 144deg;">
+              <div class="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center">
+                <span class="text-2xl font-bold text-[#FF6B35]">$49</span>
+              </div>
+            </div>
+            <h3 class="font-semibold mb-1">Upsell Signal</h3>
+            <p class="text-sm text-white/50">Willingness for premium tier</p>
+          </div>
+        </div>
+
+        <div class="mt-8 p-4 bg-[#FF6B35]/10 border border-[#FF6B35]/30 rounded-xl flex items-center gap-4">
+          <svg class="w-6 h-6 text-[#FF6B35] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          <p class="text-sm text-white/80"><strong>Minimum bar:</strong> 10% adoption within Real Estate segment + positive NPS signal to justify deeper integration investment.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 5: Option 2 Overview -->
+    <section class="slide h-full flex-col items-center justify-center px-8">
+      <div class="max-w-5xl mx-auto w-full">
+        <div class="flex items-start gap-4 mb-8">
+          <div class="w-14 h-14 bg-gradient-to-br from-main-500 to-main-400 rounded-2xl flex items-center justify-center flex-shrink-0">
+            <span class="text-2xl font-bold">2</span>
+          </div>
+          <div>
+            <p class="text-main-400 text-sm font-medium uppercase tracking-wide mb-1">Option 2</p>
+            <h2 class="text-4xl font-bold">Lead Generation Funnel</h2>
+            <p class="text-white/60 mt-2">"See your email before you sign up" • Value-first acquisition</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-5 gap-4 mb-8">
+          <div class="funnel-step p-4 bg-white/5 rounded-xl border border-white/10 text-center">
+            <div class="w-10 h-10 mx-auto mb-3 bg-[#FF6B35]/20 rounded-full flex items-center justify-center">
+              <span class="font-bold text-[#FF6B35]">1</span>
+            </div>
+            <h4 class="font-medium text-sm mb-1">Landing Page</h4>
+            <p class="text-xs text-white/50">Agent enters ZIP code + name</p>
+          </div>
+
+          <div class="funnel-step p-4 bg-white/5 rounded-xl border border-white/10 text-center">
+            <div class="w-10 h-10 mx-auto mb-3 bg-[#FF6B35]/20 rounded-full flex items-center justify-center">
+              <span class="font-bold text-[#FF6B35]">2</span>
+            </div>
+            <h4 class="font-medium text-sm mb-1">AI Generates</h4>
+            <p class="text-xs text-white/50">Branded email + video preview</p>
+          </div>
+
+          <div class="funnel-step p-4 bg-white/5 rounded-xl border border-white/10 text-center">
+            <div class="w-10 h-10 mx-auto mb-3 bg-[#FF6B35]/20 rounded-full flex items-center justify-center">
+              <span class="font-bold text-[#FF6B35]">3</span>
+            </div>
+            <h4 class="font-medium text-sm mb-1">Preview Email</h4>
+            <p class="text-xs text-white/50">See personalized result</p>
+          </div>
+
+          <div class="funnel-step p-4 bg-white/5 rounded-xl border border-white/10 text-center">
+            <div class="w-10 h-10 mx-auto mb-3 bg-main-500/20 rounded-full flex items-center justify-center">
+              <span class="font-bold text-main-400">4</span>
+            </div>
+            <h4 class="font-medium text-sm mb-1">Want to Send?</h4>
+            <p class="text-xs text-white/50">Signup gate triggered</p>
+          </div>
+
+          <div class="p-4 bg-main-600/20 rounded-xl border border-main-500/30 text-center">
+            <div class="w-10 h-10 mx-auto mb-3 bg-main-500 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <h4 class="font-medium text-sm mb-1">Conversion</h4>
+            <p class="text-xs text-white/50">New CTCT customer</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6">
+          <div class="p-6 bg-white/5 rounded-2xl border border-white/10">
+            <h3 class="font-semibold text-lg mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-[#FF6B35]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              Why This Works
+            </h3>
+            <ul class="space-y-3 text-sm text-white/70">
+              <li class="flex items-start gap-2">
+                <span class="text-[#FF6B35] mt-0.5">•</span>
+                <span><strong class="text-white">Value before commitment</strong> — see the product working with your brand before signing up</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-[#FF6B35] mt-0.5">•</span>
+                <span><strong class="text-white">Minimal friction</strong> — one prompt input, instant personalized result</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-[#FF6B35] mt-0.5">•</span>
+                <span><strong class="text-white">Qualified leads</strong> — users who want to send have clear intent</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="p-6 bg-white/5 rounded-2xl border border-white/10">
+            <h3 class="font-semibold text-lg mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-main-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+              Target Audience
+            </h3>
+            <ul class="space-y-3 text-sm text-white/70">
+              <li class="flex items-start gap-2">
+                <span class="text-main-400 mt-0.5">•</span>
+                <span>Real estate agents without email marketing solution</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-main-400 mt-0.5">•</span>
+                <span>Agents using competitors (Mailchimp, BombBomb)</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-main-400 mt-0.5">•</span>
+                <span>New agents building their marketing stack</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 6: Option 2 Prototype -->
+    <section class="slide h-full flex-col items-center justify-center px-8">
+      <div class="max-w-5xl mx-auto w-full">
+        <div class="text-center mb-8">
+          <p class="text-main-400 text-sm font-medium uppercase tracking-wide mb-3">Option 2 • Lead Gen Flow</p>
+          <h2 class="text-4xl font-bold">One Prompt → Ready-to-Send Email</h2>
+        </div>
+
+        <div class="card-glow-blue bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 border border-white/10">
+          <div class="grid grid-cols-2 gap-8">
+            <!-- Input Side -->
+            <div class="space-y-6">
+              <div class="p-6 bg-white/5 rounded-xl border border-white/10">
+                <h3 class="font-semibold mb-4 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-[#FF6B35]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.2 2.2m8.4 8.4 2.2 2.2"/><circle cx="12" cy="12" r="4"/></svg>
+                  Enter Your Info
+                </h3>
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-xs text-white/50 mb-1">Your Name</label>
+                    <div class="px-4 py-2.5 bg-white/5 rounded-lg border border-white/10 text-sm">Sarah Johnson</div>
+                  </div>
+                  <div>
+                    <label class="block text-xs text-white/50 mb-1">ZIP Code / Market Area</label>
+                    <div class="px-4 py-2.5 bg-white/5 rounded-lg border border-white/10 text-sm">78701 (Austin, TX)</div>
+                  </div>
+                  <div>
+                    <label class="block text-xs text-white/50 mb-1">Brokerage (optional)</label>
+                    <div class="px-4 py-2.5 bg-white/5 rounded-lg border border-white/10 text-sm text-white/40">Acme Real Estate</div>
+                  </div>
+                </div>
+                <button class="w-full mt-4 px-4 py-3 bg-gradient-to-r from-[#FF6B35] to-[#FF8F66] rounded-lg font-semibold flex items-center justify-center gap-2">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.2 2.2m8.4 8.4 2.2 2.2"/><circle cx="12" cy="12" r="4"/></svg>
+                  Generate My Email
+                </button>
+              </div>
+              <p class="text-center text-sm text-white/40">Takes ~5 seconds</p>
+            </div>
+
+            <!-- Output Side -->
+            <div class="bg-white rounded-xl p-4 text-slate-900">
+              <div class="bg-[#1E3A5F] rounded-t-lg p-4 -mx-4 -mt-4 mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                    <span class="text-sm font-bold text-[#1E3A5F]">SJ</span>
+                  </div>
+                  <div class="text-white">
+                    <p class="font-semibold text-sm">Sarah Johnson</p>
+                    <p class="text-xs text-white/70">Acme Real Estate</p>
+                  </div>
+                </div>
+              </div>
+              <p class="text-sm text-slate-600 mb-3">Hi there! Here's your February market update for Austin...</p>
+              <div class="bg-gradient-to-br from-[#1E3A5F] to-[#FF6B35] rounded-lg aspect-video flex items-center justify-center relative mb-3">
+                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                  <svg class="w-5 h-5 text-white ml-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+                <div class="absolute bottom-2 right-2 px-2 py-0.5 bg-black/30 rounded text-white text-[10px]">roomvu</div>
+              </div>
+              <button class="w-full py-2 bg-[#FF6B35] text-white rounded-lg text-sm font-medium">Watch Market Update</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 7: Option 2 Metrics -->
+    <section class="slide h-full flex-col items-center justify-center px-8">
+      <div class="max-w-5xl mx-auto w-full">
+        <div class="text-center mb-12">
+          <p class="text-main-400 text-sm font-medium uppercase tracking-wide mb-3">Option 2 • Success Metrics</p>
+          <h2 class="text-4xl font-bold">Funnel Conversion Targets</h2>
+        </div>
+
+        <div class="bg-white/5 rounded-2xl border border-white/10 p-8">
+          <div class="flex items-center justify-between">
+            <div class="text-center flex-1">
+              <div class="text-4xl font-bold text-white mb-2">1,000</div>
+              <p class="text-sm text-white/50">Landing page visits</p>
+              <p class="text-xs text-white/30 mt-1">Paid + organic traffic</p>
+            </div>
+            <div class="w-16 flex items-center justify-center">
+              <svg class="w-8 h-8 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+            <div class="text-center flex-1">
+              <div class="text-4xl font-bold text-[#FF6B35] mb-2">600</div>
+              <p class="text-sm text-white/50">Generate email</p>
+              <p class="text-xs text-[#FF6B35]/70 mt-1">60% completion</p>
+            </div>
+            <div class="w-16 flex items-center justify-center">
+              <svg class="w-8 h-8 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+            <div class="text-center flex-1">
+              <div class="text-4xl font-bold text-[#FF6B35] mb-2">180</div>
+              <p class="text-sm text-white/50">Click "Send/Save"</p>
+              <p class="text-xs text-[#FF6B35]/70 mt-1">30% of generated</p>
+            </div>
+            <div class="w-16 flex items-center justify-center">
+              <svg class="w-8 h-8 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+            <div class="text-center flex-1">
+              <div class="text-4xl font-bold text-main-400 mb-2">54</div>
+              <p class="text-sm text-white/50">Complete signup</p>
+              <p class="text-xs text-main-400/70 mt-1">30% of gated</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-6 mt-8">
+          <div class="p-5 bg-white/5 rounded-xl border border-white/10 text-center">
+            <div class="text-3xl font-bold text-[#FF6B35] mb-1">5.4%</div>
+            <p class="text-sm text-white/60">Landing → Signup Rate</p>
+          </div>
+          <div class="p-5 bg-white/5 rounded-xl border border-white/10 text-center">
+            <div class="text-3xl font-bold text-main-400 mb-1">$18</div>
+            <p class="text-sm text-white/60">Target CPA (at $1 CPC)</p>
+          </div>
+          <div class="p-5 bg-white/5 rounded-xl border border-white/10 text-center">
+            <div class="text-3xl font-bold gradient-text mb-1">2.5x</div>
+            <p class="text-sm text-white/60">vs. standard signup flow</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 8: Comparison -->
+    <section class="slide h-full flex-col items-center justify-center px-8">
+      <div class="max-w-5xl mx-auto w-full">
+        <div class="text-center mb-10">
+          <p class="text-white/50 text-sm font-medium uppercase tracking-wide mb-3">Decision Framework</p>
+          <h2 class="text-4xl font-bold">Option Comparison</h2>
+        </div>
+
+        <div class="grid grid-cols-2 gap-8">
+          <!-- Option 1 -->
+          <div class="option-card p-6 bg-gradient-to-br from-[#FF6B35]/10 to-transparent rounded-2xl border border-[#FF6B35]/30">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-12 h-12 bg-[#FF6B35] rounded-xl flex items-center justify-center">
+                <span class="text-xl font-bold">1</span>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg">AI Content Promotion</h3>
+                <p class="text-sm text-white/50">Existing user activation</p>
+              </div>
+            </div>
+            <div class="space-y-4">
+              <div class="flex justify-between items-center py-2 border-b border-white/10">
+                <span class="text-sm text-white/70">Engineering Effort</span>
+                <span class="text-sm font-medium">Medium</span>
+              </div>
+              <div class="flex justify-between items-center py-2 border-b border-white/10">
+                <span class="text-sm text-white/70">Time to Launch</span>
+                <span class="text-sm font-medium">4-6 weeks</span>
+              </div>
+              <div class="flex justify-between items-center py-2 border-b border-white/10">
+                <span class="text-sm text-white/70">Primary Metric</span>
+                <span class="text-sm font-medium text-[#FF6B35]">Feature Adoption</span>
+              </div>
+              <div class="flex justify-between items-center py-2 border-b border-white/10">
+                <span class="text-sm text-white/70">Revenue Impact</span>
+                <span class="text-sm font-medium">Retention + Upsell</span>
+              </div>
+              <div class="flex justify-between items-center py-2">
+                <span class="text-sm text-white/70">Risk Level</span>
+                <span class="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs font-medium rounded">Medium</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Option 2 -->
+          <div class="option-card p-6 bg-gradient-to-br from-main-600/10 to-transparent rounded-2xl border border-main-500/30">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-12 h-12 bg-main-600 rounded-xl flex items-center justify-center">
+                <span class="text-xl font-bold">2</span>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg">Lead Gen Funnel</h3>
+                <p class="text-sm text-white/50">New user acquisition</p>
+              </div>
+            </div>
+            <div class="space-y-4">
+              <div class="flex justify-between items-center py-2 border-b border-white/10">
+                <span class="text-sm text-white/70">Engineering Effort</span>
+                <span class="text-sm font-medium">Low-Medium</span>
+              </div>
+              <div class="flex justify-between items-center py-2 border-b border-white/10">
+                <span class="text-sm text-white/70">Time to Launch</span>
+                <span class="text-sm font-medium">2-4 weeks</span>
+              </div>
+              <div class="flex justify-between items-center py-2 border-b border-white/10">
+                <span class="text-sm text-white/70">Primary Metric</span>
+                <span class="text-sm font-medium text-main-400">Signup Conversion</span>
+              </div>
+              <div class="flex justify-between items-center py-2 border-b border-white/10">
+                <span class="text-sm text-white/70">Revenue Impact</span>
+                <span class="text-sm font-medium">New MRR</span>
+              </div>
+              <div class="flex justify-between items-center py-2">
+                <span class="text-sm text-white/70">Risk Level</span>
+                <span class="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-medium rounded">Low</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 p-4 bg-white/5 border border-white/10 rounded-xl text-center">
+          <p class="text-white/70"><strong class="text-white">Recommendation:</strong> Run both experiments in parallel. Option 2 validates acquisition; Option 1 validates retention value.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 9: Path to Long-Term -->
+    <section class="slide h-full flex-col items-center justify-center px-8">
+      <div class="max-w-5xl mx-auto w-full">
+        <div class="text-center mb-10">
+          <p class="text-[#FF6B35] text-sm font-medium uppercase tracking-wide mb-3">From Experiments to Product</p>
+          <h2 class="text-4xl font-bold">Path to Long-Term Integration</h2>
+        </div>
+
+        <div class="relative">
+          <div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#FF6B35] via-main-500 to-main-700 transform -translate-x-1/2"></div>
+          
+          <div class="space-y-8">
+            <!-- Phase 1 -->
+            <div class="flex items-center gap-8">
+              <div class="flex-1 text-right">
+                <div class="inline-block p-5 bg-[#FF6B35]/10 rounded-xl border border-[#FF6B35]/30">
+                  <p class="text-[#FF6B35] text-xs font-medium uppercase tracking-wide mb-1">Now — Q1 2026</p>
+                  <h3 class="font-bold text-lg mb-2">Experiments</h3>
+                  <p class="text-sm text-white/60">Validate demand with lightweight integrations. Measure adoption and conversion signals.</p>
+                </div>
+              </div>
+              <div class="w-4 h-4 bg-[#FF6B35] rounded-full border-4 border-slate-900 z-10"></div>
+              <div class="flex-1"></div>
+            </div>
+
+            <!-- Phase 2 -->
+            <div class="flex items-center gap-8">
+              <div class="flex-1"></div>
+              <div class="w-4 h-4 bg-main-500 rounded-full border-4 border-slate-900 z-10"></div>
+              <div class="flex-1">
+                <div class="inline-block p-5 bg-main-600/10 rounded-xl border border-main-500/30">
+                  <p class="text-main-400 text-xs font-medium uppercase tracking-wide mb-1">Q2 2026</p>
+                  <h3 class="font-bold text-lg mb-2">Native Integration</h3>
+                  <p class="text-sm text-white/60">Deep API integration. SSO, synced contacts, campaign analytics in CTCT dashboard.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Phase 3 -->
+            <div class="flex items-center gap-8">
+              <div class="flex-1 text-right">
+                <div class="inline-block p-5 bg-main-700/10 rounded-xl border border-main-600/30">
+                  <p class="text-main-300 text-xs font-medium uppercase tracking-wide mb-1">Q3 2026</p>
+                  <h3 class="font-bold text-lg mb-2">Bundled Offering</h3>
+                  <p class="text-sm text-white/60">Co-marketed "Real Estate Pro" tier. Joint pricing, shared revenue.</p>
+                </div>
+              </div>
+              <div class="w-4 h-4 bg-main-600 rounded-full border-4 border-slate-900 z-10"></div>
+              <div class="flex-1"></div>
+            </div>
+
+            <!-- Phase 4 -->
+            <div class="flex items-center gap-8">
+              <div class="flex-1"></div>
+              <div class="w-4 h-4 bg-main-700 rounded-full border-4 border-slate-900 z-10"></div>
+              <div class="flex-1">
+                <div class="inline-block p-5 bg-main-800/10 rounded-xl border border-main-700/30">
+                  <p class="text-main-200 text-xs font-medium uppercase tracking-wide mb-1">Q4 2026+</p>
+                  <h3 class="font-bold text-lg mb-2">Platform Expansion</h3>
+                  <p class="text-sm text-white/60">Extend model to Insurance, Financial Services, other verticals.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-10 text-center">
+          <a href="roomvu-integration-proposal.html" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#FF6B35] to-main-600 rounded-xl font-semibold hover:opacity-90 transition-opacity">
+            View Long-Term Vision Deck
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 10: Next Steps -->
+    <section class="slide h-full flex-col items-center justify-center px-8">
+      <div class="max-w-4xl mx-auto w-full text-center">
+        <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-8">
+          <svg class="w-4 h-4 text-[#FF6B35]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <span class="text-sm font-medium">Ready for Decision</span>
+        </div>
+        <h2 class="text-5xl font-bold mb-6">
+          <span class="gradient-text">Next Steps</span>
+        </h2>
+        
+        <div class="grid grid-cols-3 gap-6 mt-12 text-left">
+          <div class="p-6 bg-white/5 rounded-2xl border border-white/10">
+            <div class="w-10 h-10 bg-[#FF6B35]/20 rounded-lg flex items-center justify-center mb-4">
+              <span class="font-bold text-[#FF6B35]">1</span>
+            </div>
+            <h3 class="font-semibold mb-2">Stakeholder Alignment</h3>
+            <p class="text-sm text-white/60">Review with Product, Engineering, and Partnerships to confirm scope and resource allocation.</p>
+          </div>
+
+          <div class="p-6 bg-white/5 rounded-2xl border border-white/10">
+            <div class="w-10 h-10 bg-[#FF6B35]/20 rounded-lg flex items-center justify-center mb-4">
+              <span class="font-bold text-[#FF6B35]">2</span>
+            </div>
+            <h3 class="font-semibold mb-2">roomvu Partnership Call</h3>
+            <p class="text-sm text-white/60">Technical discovery with roomvu team on API capabilities and co-marketing opportunities.</p>
+          </div>
+
+          <div class="p-6 bg-white/5 rounded-2xl border border-white/10">
+            <div class="w-10 h-10 bg-[#FF6B35]/20 rounded-lg flex items-center justify-center mb-4">
+              <span class="font-bold text-[#FF6B35]">3</span>
+            </div>
+            <h3 class="font-semibold mb-2">Sprint Planning</h3>
+            <p class="text-sm text-white/60">Define MVP scope for both experiments. Target launch within 4 weeks.</p>
+          </div>
+        </div>
+
+        <div class="mt-12 flex items-center justify-center gap-4">
+          <a href="../prototypes/email-editor-roomvu.html" target="_blank" class="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-colors flex items-center gap-2">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
+            View Editor Prototype
+          </a>
+          <a href="roomvu-integration-proposal.html" class="px-6 py-3 bg-gradient-to-r from-[#FF6B35] to-[#FF8F66] rounded-xl font-medium flex items-center gap-2">
+            Long-Term Vision
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Keyboard hint -->
+  <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-2 text-xs text-white/30">
+    <span class="px-2 py-1 bg-white/5 rounded border border-white/10">←</span>
+    <span class="px-2 py-1 bg-white/5 rounded border border-white/10">→</span>
+    <span class="ml-2">to navigate</span>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+
+    function showSlide(index) {
+      slides.forEach((slide, i) => {
+        slide.classList.remove('active');
+        if (i === index) {
+          slide.classList.add('active');
+        }
+      });
+      document.getElementById('slide-counter').textContent = `${index + 1} / ${totalSlides}`;
+      sessionStorage.setItem('roomvu-short-term-slide', index);
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      showSlide(currentSlide);
+    }
+
+    function prevSlide() {
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      showSlide(currentSlide);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+      }
+    });
+
+    // Restore last viewed slide
+    const savedSlide = sessionStorage.getItem('roomvu-short-term-slide');
+    if (savedSlide !== null) {
+      currentSlide = parseInt(savedSlide);
+    }
+    showSlide(currentSlide);
+  </script>
+</body>
+</html>
+
